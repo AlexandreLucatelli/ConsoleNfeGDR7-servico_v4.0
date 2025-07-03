@@ -1,0 +1,168 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CL_NFE.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="CL_NFE_HomologRecepcao_NfeRecepcao" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/nfeWEB/services/NfeRecepcao.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomologRetRecepcao_NfeRetRecepcao" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/nfeWEB/services/NfeRetRecepcao.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProducaoRecepcao_NfeRecepcao" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/nfeWEB/services/NfeRecepcao.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProducaoRetRecepcao_NfeRetRecepcao" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/nfeWEB/services/NfeRetRecepcao.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProducaoCancelamento_NfeCancelamento" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/nfeWEB/services/NfeCancelamento.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomologCancelamento_NfeCancelamento" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/nfeWEB/services/NfeCancelamento.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANHomologCancelamento_NfeCancelamento" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.scan.fazenda.gov.br/NfeCancelamento2/NfeCancelamento2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANHomologRecepcao_NfeRecepcao" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.scan.fazenda.gov.br/NfeRecepcao2/NfeRecepcao2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANHomologRetRecepcao_NfeRetRecepcao" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.scan.fazenda.gov.br/NfeRetRecepcao2/NfeRetRecepcao2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANProducaoCancelamento_NfeCancelamento" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.scan.fazenda.gov.br/NfeCancelamento2/NfeCancelamento2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANProducaoRecepcao_NfeRecepcao" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.scan.fazenda.gov.br/NfeRecepcao2/NfeRecepcao2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANProducaoRetRecepcao_NfeRetRecepcao" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.scan.fazenda.gov.br/NfeRetRecepcao2/NfeRetRecepcao2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomologCancelamento2_NfeCancelamento2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/nfeweb/services/NfeCancelamento2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomologRetRecepcao2_NfeRecepcao2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/nfeweb/services/NfeRecepcao2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProducaoCancelamento2_NfeCancelamento2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/nfeweb/services/nfecancelamento2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProducaoRecepcao2_NfeRecepcao2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/ws/nfeautorizacao.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProducaoRetRecepcao2_NfeRetRecepcao2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/ws/nferetautorizacao.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomologRetRecepcao2_NfeRetRecepcao2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/nferetautorizacao.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomologacaoCCe_RecepcaoEvento" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/recepcaoevento.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomologRecepcao2_NfeRecepcao2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/nfeautorizacao.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANHomologCancelamento_NfeCancelamento2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://hom.nfe.fazenda.gov.br/SCAN/NfeCancelamento2/NfeCancelamento2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANHomologRecepcao_NfeRecepcao2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://hom.nfe.fazenda.gov.br/SCAN/NfeRecepcao2/NfeRecepcao2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANHomologRetRecepcao_NfeRetRecepcao2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://hom.nfe.fazenda.gov.br/SCAN/NfeRetRecepcao2/NfeRetRecepcao2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANHomologStatusServico_NfeStatusServico2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://hom.nfe.fazenda.gov.br/SCAN/NfeStatusServico2/NfeStatusServico2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANProducaoCancelamento_NfeCancelamento2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.scan.fazenda.gov.br/NfeCancelamento2/NfeCancelamento2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANProducaoRecepcao_NfeRecepcao2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.scan.fazenda.gov.br/NfeRecepcao2/NfeRecepcao2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANProducaoRetRecepcao_NfeRetRecepcao2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.scan.fazenda.gov.br/NfeRetRecepcao2/NfeRetRecepcao2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_SCANProducaoStatusServico_NfeStatusServico2" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.scan.fazenda.gov.br/NfeStatusServico2/NfeStatusServico2.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomologacaoEvento_RecepcaoEvento" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/recepcaoevento.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProducaoEvento_RecepcaoEvento" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/ws/recepcaoevento.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_nfeinutilizacao4_NFeInutilizacao4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/nfeinutilizacao4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoNFeConsultaProtocolo4_NFeConsultaProtocolo4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/nfeconsultaprotocolo4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoNFeStatusServico4_NFeStatusServico4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/nfestatusservico4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoCadConsultaCadastro4_CadConsultaCadastro4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/cadconsultacadastro4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoNFeRecepcaoEvento4_NFeRecepcaoEvento4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/nferecepcaoevento4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoNFeAutorizacao4_NFeAutorizacao4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/nfeautorizacao4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoNFeRetAutorizacao4_NFeRetAutorizacao4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://homologacao.nfe.fazenda.sp.gov.br/ws/nferetautorizacao4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdNFeInutilizacao4_NFeInutilizacao4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/ws/nfeinutilizacao4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdNFeConsultaProtocolo4_NFeConsultaProtocolo4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/ws/nfeconsultaprotocolo4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdNFeStatusServico4_NFeStatusServico4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/ws/nfestatusservico4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdCadConsultaCadastro4_CadConsultaCadastro4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/ws/cadconsultacadastro4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdNFeRecepcaoEvento4_NFeRecepcaoEvento4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/ws/nferecepcaoevento4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdNFeAutorizacao4_NFeAutorizacao4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/ws/nfeautorizacao4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdNFeRetAutorizacao4_NFeRetAutorizacao4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nfe.fazenda.sp.gov.br/ws/nferetautorizacao4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoSVCNFeConsultaProtocolo4_NFeConsultaProtocolo4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://hom.svc.fazenda.gov.br/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoSVCNFeStatusServico4_NFeStatusServico4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://hom.svc.fazenda.gov.br/NFeStatusServico4/NFeStatusServico4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoSVCNFeRecepcaoEvento4_NFeRecepcaoEvento4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://hom.svc.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoSVCNFeAutorizacao4_NFeAutorizacao4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://hom.svc.fazenda.gov.br/NFeAutorizacao4/NFeAutorizacao4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_HomoSVCNFeRetAutorizacao4_NFeRetAutorizacao4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://hom.svc.fazenda.gov.br/NFeRetAutorizacao4/NFeRetAutorizacao4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdSVCNFeConsultaProtocolo4_NFeConsultaProtocolo4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.svc.fazenda.gov.br/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdSVCNFeStatusServico4_NFeStatusServico4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.svc.fazenda.gov.br/NFeStatusServico4/NFeStatusServico4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdSVCNFeRecepcaoEvento4_NFeRecepcaoEvento4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.svc.fazenda.gov.br/NFeRecepcaoEvento4/NFeRecepcaoEvento4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdSVCNFeAutorizacao4_NFeAutorizacao4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.svc.fazenda.gov.br/NFeAutorizacao4/NFeAutorizacao4.asmx</Value>
+    </Setting>
+    <Setting Name="CL_NFE_ProdSVCNFeRetAutorizacao4_NFeRetAutorizacao4" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://www.svc.fazenda.gov.br/NFeRetAutorizacao4/NFeRetAutorizacao4.asmx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
