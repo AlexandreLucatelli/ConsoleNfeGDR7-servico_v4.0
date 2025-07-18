@@ -1,19 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using Microsoft.ApplicationBlocks.Data;
+using NFE.Classes.AcessoDados;
+using NFE.Classes.NFE.Assinatura;
 using NFE.Classes.NFE.Objetos;
+using NFE.Classes.Util;
+using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using Microsoft.ApplicationBlocks.Data;
-using NFE.Classes.AcessoDados;
+using System.Gdr7.Util;
+using System.IO;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
+using System.Text;
 using System.Xml;
-using NFE.Classes.Util;
-using System.Net;
-using NFE.Classes.NFE.Assinatura;
 
 namespace NFE.Classes.NFE
 {
@@ -23,28 +24,17 @@ namespace NFE.Classes.NFE
         protected SqlDataReader DrNotas;
         protected SqlDataReader DrCont;
         public string Conexao;
-         public String Observacao;
+        public String Observacao;
         protected NotaFiscalEletronica obj = new NotaFiscalEletronica();
         protected Cabecalho oCabecalho = new Cabecalho();
         protected Utils oUtil = new Utils();
         protected StringBuilder IdNota = new StringBuilder();
         protected XmlNode nodeRetorno;
-
-        //// Homologação
-        //protected CL_NFE.HomologRecepcao2.NfeAutorizacao objRecepcao = new CL_NFE.HomologRecepcao2.NfeAutorizacao();
-        //protected CL_NFE.HomologRetRecepcao2.NfeRetAutorizacao objRetRecepcao = new CL_NFE.HomologRetRecepcao2.NfeRetAutorizacao();
-
-        //// Produção
-        //protected CL_NFE.ProducaoRecepcao2.NfeAutorizacao objRecepcaoProducao = new CL_NFE.ProducaoRecepcao2.NfeAutorizacao();
-        //protected CL_NFE.ProducaoRetRecepcao2.NfeRetAutorizacao objRetRecepcaoProducao = new CL_NFE.ProducaoRetRecepcao2.NfeRetAutorizacao();
-
-        //// SCAN - Homologação
-        //protected CL_NFE.SCANHomologRecepcao.NfeRecepcao2 objSCANRecepcao = new CL_NFE.SCANHomologRecepcao.NfeRecepcao2();
-        //protected CL_NFE.SCANHomologRetRecepcao.NfeRetRecepcao2 objSCANRetRecepcao = new CL_NFE.SCANHomologRetRecepcao.NfeRetRecepcao2();
-
-        //// SCAN - Produção
-        //protected CL_NFE.SCANProducaoRecepcao.NfeRecepcao2 objSCANRecepcaoProducao = new CL_NFE.SCANProducaoRecepcao.NfeRecepcao2();
-        //protected CL_NFE.SCANProducaoRetRecepcao.NfeRetRecepcao2 objSCANRetRecepcaoProducao = new CL_NFE.SCANProducaoRetRecepcao.NfeRetRecepcao2();
+        public String MotivoNfe;
+        public String nProt;
+        public String dtRetorno;
+        public String StatusNfe;
+        public string pastaErro = ConfigurationManager.AppSettings["PastaErro"].ToString();
 
         //Homologação Sefaz São Paulo 4.00
         protected CL_NFE.HomoNFeAutorizacao4.NFeAutorizacao4 objRecepcao4 = new CL_NFE.HomoNFeAutorizacao4.NFeAutorizacao4();
@@ -68,332 +58,6 @@ namespace NFE.Classes.NFE
             Conexao = FncVerificaConexao();
         }
 
-        public String XmlValidacao(Int64 IDNotaFiscal)
-        {
-            String RetValidacao = "";
-            SqlConnection cnnXmlValidacao = new SqlConnection(Conexao);
-            SqlConnection cnnXmlValidacao2 = new SqlConnection(Conexao);
-
-            try
-            {               
-                SqlDataReader DrValidacao;
-                DrValidacao = SqlHelper.ExecuteReader(cnnXmlValidacao, "stpRetornaNotaFiscalValidacao", IDNotaFiscal.ToString());
-
-                if (DrValidacao.Read())
-                {
-                    NotaFiscalEletronica oNfe = new NotaFiscalEletronica();
-
-                    #region Parte Responsável por formar o ID do cabeçalho da Nota e acrescentar o digito no mesmo
-
-                    Dr = SqlHelper.ExecuteReader(cnnXmlValidacao2, "stpRetornaParametrosNFE", null);
-
-                    if (Dr.Read())
-                    {
-                        oNfe.cUf = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
-                        oNfe.CNPJ = Dr["cnpj"] is DBNull ? "0".PadLeft(14, '0') : Dr["cnpj"].ToString();
-                        oNfe.mod = Dr["mod"] is DBNull ? "0" : Dr["mod"].ToString();
-
-                        oNfe.Det.Ipost.Pis.CST = Dr["PisCST"] is DBNull ? "01" : Dr["PisCST"].ToString();
-                        oNfe.Det.Ipost.Cofins.CST = Dr["CofinsCST"] is DBNull ? "01" : Dr["CofinsCST"].ToString();
-                        /*     O Campo ICMS 00 tem os valroes abaixo
-                               0 – Nacional;
-                               1 – Estrangeira – Importação direta;
-                               2 – Estrangeira – Adquirida no
-                               mercado interno.*/
-
-                        oNfe.Det.Ipost.Ipi.clEnq = Dr["IPIClasseEnquadramento"] is DBNull ? "999" : Dr["IPIClasseEnquadramento"].ToString();
-                        oNfe.Det.Ipost.Ipi.cEnq = Dr["IPICodEnquadramento"] is DBNull ? "999" : Dr["IPICodEnquadramento"].ToString();
-
-                        oNfe.Det.Ipost.Icms.ICMs00.CST = Dr["ICMSCst"] is DBNull ? "00" : Dr["ICMSCst"].ToString();
-                        oNfe.Det.Ipost.Icms.ICMs00.modBC = Dr["ModBC"] is DBNull ? "3" : Dr["ModBC"].ToString();
-
-                        oNfe.Det.Ipost.Icms.ICMs20.CST = Dr["ICMS20CST"] is DBNull ? 20 : decimal.Parse(Dr["ICMS20CST"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs20.modBC = Dr["ICMS20ModBC"] is DBNull ? 3 : decimal.Parse(Dr["ICMS20ModBC"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs20.pRedBC = Dr["ICMS20pRedBC"] is DBNull ? 0 : decimal.Parse(Dr["ICMS20pRedBC"].ToString());
-
-                        oNfe.Det.Ipost.Icms.ICMs40.CST = Dr["ICMS40CST"] is DBNull ? 40 : decimal.Parse(Dr["ICMS40CST"].ToString());
-
-                        //NEW - VALORES DE CST PARA GRUPO ICMS40!!
-                        oNfe.Det.Ipost.Icms.ICMs40.CST41 = Dr["ICMS41CST"] is DBNull ? 41 : float.Parse(Dr["ICMS41CST"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs40.CST50 = Dr["ICMS50CST"] is DBNull ? 50 : float.Parse(Dr["ICMS50CST"].ToString());
-
-                        oNfe.Det.Ipost.Icms.ICMs51.CST = Dr["ICMS51CST"] is DBNull ? 51 : decimal.Parse(Dr["ICMS51CST"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs51.modBC = Dr["ICMS51ModBC"] is DBNull ? 3 : decimal.Parse(Dr["ICMS51ModBC"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs51.pRedBC = Dr["ICMS51pRedBC"] is DBNull ? 0 : decimal.Parse(Dr["ICMS51pRedBC"].ToString());
-
-                        oNfe.Det.Ipost.Icms.ICMs60.CST = Dr["ICMSCst"] is DBNull ? "00" : Dr["ICMSCst"].ToString();
-
-                        oNfe.Det.Ipost.Icms.ICMs70.CST = Dr["ICMS70CST"] is DBNull ? 51 : decimal.Parse(Dr["ICMS70CST"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs70.modBC = Dr["ICMS70ModBC"] is DBNull ? 3 : decimal.Parse(Dr["ICMS70ModBC"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs70.pRedBC = Dr["ICMS70pRedBC"] is DBNull ? 0 : decimal.Parse(Dr["ICMS70pRedBC"].ToString());
-
-                        oNfe.RefNf.cUF = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
-                        oNfe.RefNf.CNPJ = Dr["cnpj"] is DBNull ? string.Empty : Dr["cnpj"].ToString();
-                        oNfe.RefNf.tpImp = Dr["tpImp"] is DBNull ? "1" : Dr["tpImp"].ToString();
-                        oNfe.RefNf.tpAmb = ConfigurationManager.AppSettings["Ambiente"].ToString();
-
-                        oNfe.RefNf.procEmi = Dr["procEmiss"] is DBNull ? "0" : Dr["procEmiss"].ToString();
-                        oNfe.RefNf.AAMM = DateTime.Now.ToString("yyMM");
-                        oNfe.RefNf.mod = Dr["refNFMod"] is DBNull ? "01" : Dr["refNFMod"].ToString();
-                        oNfe.RefNf.serie = Dr["refNFSerie"] is DBNull ? "0" : Dr["refNFSerie"].ToString();
-
-                        oNfe.Ide.Mod = Dr["mod"] is DBNull ? "55" : Dr["mod"].ToString();
-                        oNfe.Ide.tpImp = Dr["tpImp"] is DBNull ? 1 : int.Parse(Dr["tpImp"].ToString());
-                        oNfe.Ide.tpEmis = Dr["tpEmis"] is DBNull ? "1" : Dr["tpEmis"].ToString();
-                        oNfe.Ide.Serie = Dr["serie"] is DBNull ? "0" : Dr["serie"].ToString();
-                        oNfe.Ide.tpAmb = ConfigurationManager.AppSettings["Ambiente"].ToString();
-                        oNfe.Ide.procEmi = Dr["procEmiss"] is DBNull ? "0" : Dr["procEmiss"].ToString();
-                        oNfe.Ide.dSaiEnt = DateTime.Now.ToString("yyyy-MM-dd");
-                        oNfe.Ide.verProc = Dr["VerProc"] is DBNull ? "NF-eletronica.com" : Dr["VerProc"].ToString();
-                        oNfe.Ide.cUF = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
-                        oNfe.Ide.cMunFG = Dr["cMunFg"] is DBNull ? 0 : int.Parse(Dr["cMunFg"].ToString());
-                        oNfe.Ide.tpImp = Dr["tpImp"] is DBNull ? 1 : int.Parse(Dr["tpImp"].ToString());
-
-                        //NEW VERSÃO NFe 4.01!
-                        oNfe.Ide.dhCont = Dr["dhCont"] is DBNull ? string.Empty : Convert.ToDateTime(Dr["dhCont"].ToString()).ToString("yyyy-MM-ddTHH:mm:ss");
-                        oNfe.Ide.xJust = Dr["xJust"] is DBNull ? string.Empty : Dr["xJust"].ToString();
-
-                        oNfe.Emit.EnderEmit.cMun = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
-                        oNfe.Emit.EnderEmit.xPais = Dr["DescPais"] is DBNull ? string.Empty : Dr["DescPais"].ToString();
-                        oNfe.Emit.EnderEmit.cPais = Dr["CodPais"] is DBNull ? string.Empty : Dr["CodPais"].ToString();
-
-                        oNfe.Dest.EnderDest.xPais = Dr["DescPais"] is DBNull ? string.Empty : Dr["DescPais"].ToString();
-                        oNfe.Dest.EnderDest.cPais = Dr["CodPais"] is DBNull ? string.Empty : Dr["CodPais"].ToString();
-                    }
-                    Dr.Close();
-
-                    oNfe.AAMM = DateTime.Now.ToString("yyMM");
-
-                    #endregion
-
-                    #region Parte Responsável selecionar os dados da empresa Emissora
-
-                    Dr = SqlHelper.ExecuteReader(cnnXmlValidacao2, "stpRetornaDadosEmpresa", null);
-
-                    if (Dr.Read())
-                    {
-                        oNfe.Emit.CNPJ = Dr["CNPJ"] is DBNull ? "0" : Dr["CNPJ"].ToString().Replace(".", "").Replace("/", "").PadLeft(14, '0').Replace("-", "");
-                        oNfe.Emit.xNome = Dr["Empresa"] is DBNull ? string.Empty : Dr["Empresa"].ToString();
-                        oNfe.Emit.xFant = Dr["Fantasia"] is DBNull ? string.Empty : Dr["Fantasia"].ToString();
-                        oNfe.Emit.EnderEmit.IE = Dr["IE"] is DBNull ? string.Empty : Dr["IE"].ToString();
-                        oNfe.Emit.EnderEmit.xLgr = Dr["Endereco"] is DBNull ? string.Empty : (Dr["Endereco"].ToString().Length > 60 ? Dr["Endereco"].ToString().Substring(0, 60) : Dr["Endereco"].ToString().Trim());
-                        oNfe.Emit.EnderEmit.nro = Dr["Numero"] is DBNull ? string.Empty : Dr["Numero"].ToString();
-                        oNfe.Emit.EnderEmit.xCpl = Dr["Complemento"] is DBNull ? string.Empty : Dr["Complemento"].ToString();
-                        oNfe.Emit.EnderEmit.xBairro = Dr["Bairro"] is DBNull ? string.Empty : (Dr["Bairro"].ToString().Length > 60 ? Dr["Bairro"].ToString().Substring(0, 60) : Dr["Bairro"].ToString().Trim());
-                        oNfe.Emit.EnderEmit.cMun = Dr["CodMunicipio"] is DBNull ? string.Empty : Dr["CodMunicipio"].ToString().PadLeft(7, '0');
-                        oNfe.Emit.EnderEmit.xMun = Dr["Municipio"] is DBNull ? string.Empty : (Dr["Municipio"].ToString().Length > 60 ? Dr["Municipio"].ToString().Substring(0, 60) : Dr["Municipio"].ToString().Trim());
-                        oNfe.Emit.EnderEmit.UF = Dr["UF"] is DBNull ? string.Empty : Dr["UF"].ToString().Length > 2 ? Dr["UF"].ToString().Substring(0, 2) : Dr["UF"].ToString().Trim();
-                        oNfe.Emit.EnderEmit.CEP = Dr["CEP"] is DBNull ? string.Empty : Dr["CEP"].ToString().Replace("-", "").Length > 8 ? Dr["CEP"].ToString().Replace("-", "").Substring(0, 8) : Dr["CEP"].ToString().Replace("-", "").Trim();
-                        oNfe.Emit.EnderEmit.fone = Dr["Telefone"] is DBNull ? string.Empty : Dr["Telefone"].ToString().Replace(".", "").Replace("/", "").Replace("(", "").Replace(")", "").Replace(" ", "").Trim();
-                    }
-                    Dr.Close();
-
-                    #endregion
-
-                    #region propriedades
-
-                    oNfe.cNF = DrValidacao["IdNota"] is DBNull ? "0" : DrValidacao["IdNota"].ToString();
-
-                    oNfe.nNF = DrValidacao["Numero"] is DBNull ? "1" : DrValidacao["Numero"].ToString();
-
-                    //oNfe.LocalDesembDI = DrValidacao["LocalDesembDI"].ToString();
-                    //oNfe.UFDesembDI = DrValidacao["UFDesembDI"].ToString();
-                    //oNfe.NumDocDI = DrValidacao["NumDocDI"].ToString();
-
-                    //oNfe.DataRegistroDI = DrValidacao["DataRegistroDI"] is DBNull ? string.Empty : Convert.ToDateTime(DrValidacao["DataRegistroDI"].ToString()).ToString("yyyy-MM-dd");
-                    //oNfe.IDFabEstrangeiro = DrValidacao["IDFabEstrangeiro"].ToString();
-
-                    //DataSet Ds = new DataSet();
-
-                    //Ds = SqlHelper.ExecuteDataset(Conexao, "StpRetornaTipoPagamentoFatura", oNfe.cNF);
-
-                    //if (Ds.Tables[0].Rows.Count == 1)
-                    //{
-                    //    foreach (DataRow Drow in Ds.Tables[0].Rows)
-                    //    {
-                    //        DateTime DtVencimento = DateTime.Parse(Drow["dtVencimento"].ToString());
-                    //        DateTime DtAtual = DateTime.Parse(DateTime.Now.ToString("dd/MM/yyyy"));
-
-                    //        int Resultado = DateTime.Compare(DtVencimento, DtAtual);
-                    //        // Retorna -1 Quando o Vencimento for menor que o Atual
-                    //        // Retorna  0 Quando for Iguais
-                    //        // Retorna  1 Quando o vencimento for maior que a data atual
-
-                    //        if (Resultado == -1 || Resultado == 0)
-                    //        {
-                    //            oNfe.Ide.indPag = 0;
-                    //        }
-                    //        else
-                    //        {
-                    //            oNfe.Ide.indPag = 1;
-                    //        }
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    oNfe.Ide.indPag = 0;
-                    //}
-                    //Ds.Dispose();
-
-                    oNfe.RefNf.chNfeReferenciada = DrValidacao["chNFeReferenciada"] is DBNull ? "0" : DrValidacao["chNFeReferenciada"].ToString();
-                    oNfe.RefNf.finNFe = DrValidacao["finNfe"] is DBNull ? "1" : DrValidacao["finNfe"].ToString();
-
-                    oNfe.TRansp.modFrete = DrValidacao["modFrete"] is DBNull ? 1 : int.Parse(DrValidacao["modFrete"].ToString());
-                    oNfe.TRansp.IdTransportadora = DrValidacao["idTransportadora"] is DBNull ? 0 : int.Parse(DrValidacao["idTransportadora"].ToString());
-                    oNfe.TRansp.VeicTransp.placa = DrValidacao["PlacaVeic"].ToString() == "" ? "0" : DrValidacao["PlacaVeic"].ToString();
-                    oNfe.TRansp.VeicTransp.UF = DrValidacao["UfVeiculo"] is DBNull ? "0" : DrValidacao["UfVeiculo"].ToString();
-
-                    oNfe.TRansp.Vol.qVol = DrValidacao["Volumes"] is DBNull ? "0" : DrValidacao["Volumes"].ToString();
-                    oNfe.TRansp.Vol.esp = DrValidacao["Especie"] is DBNull ? string.Empty : DrValidacao["Especie"].ToString();
-                    oNfe.TRansp.Vol.marca = DrValidacao["Marca"].ToString() == "" ? "Indefinido" : DrValidacao["Marca"].ToString();
-
-                    oNfe.TRansp.Vol.pesoL = DrValidacao["PesoLiquido"] is DBNull ? 0 : decimal.Parse(DrValidacao["PesoLiquido"].ToString().Replace(".", ","));
-                    oNfe.TRansp.Vol.pesoB = DrValidacao["PesoBruto"] is DBNull ? 0 : decimal.Parse(DrValidacao["PesoBruto"].ToString().Replace(".", ","));
-
-                    oNfe.IDCliente = Convert.ToInt64(DrValidacao["IdCliente"] is DBNull ? 0 : int.Parse(DrValidacao["IdCliente"].ToString()));
-
-                    oNfe.Ide.nNF = DrValidacao["Numero"] is DBNull ? "0" : DrValidacao["Numero"].ToString();
-                    oNfe.Ide.natOp = DrValidacao["DescNaturezaOP"] is DBNull ? "0" : oUtil.FUNC_CARACTER_ESPECIAL(DrValidacao["DescNaturezaOP"].ToString());
-                    oNfe.Ide.tpNF = DrValidacao["TpNf"] is DBNull ? 0 : int.Parse(DrValidacao["TpNf"].ToString());
-                    oNfe.Ide.tpEmis = DrValidacao["tpEmis"] is DBNull ? "1" : DrValidacao["tpEmis"].ToString();
-                    oNfe.Ide.Serie = DrValidacao["serie"] is DBNull ? "0" : DrValidacao["serie"].ToString();
-
-                    //oNfe.Ide.dEmi = DateTime.Now.ToString("yyyy-MM-dd");
-                    oNfe.Ide.cNF = DrValidacao["IdNota"] is DBNull ? "0" : DrValidacao["IdNota"].ToString();
-
-                    oNfe.Ide.dhCont = DrValidacao["dhCont"] is DBNull ? string.Empty : Convert.ToDateTime(DrValidacao["dhCont"].ToString()).ToString("yyyy-MM-ddTHH:mm:ss");
-                    oNfe.Ide.xJust = DrValidacao["xJust"] is DBNull ? string.Empty : DrValidacao["xJust"].ToString();
-
-                    IdNota = null;
-                    IdNota = new StringBuilder();
-
-                    //NOVO LAYOUT 2.00!
-                    IdNota.Append(
-                                  oNfe.cUf.PadLeft(2, '0') +
-                                  oNfe.AAMM +
-                                  oNfe.CNPJ.PadLeft(14, '0') +
-                                  oNfe.mod.PadLeft(2, '0') +
-                                  oNfe.Ide.Serie.PadLeft(3, '0') +
-                                  oNfe.nNF.PadLeft(9, '0') +
-                                  oNfe.Ide.tpEmis +
-                                  oNfe.cNF.PadLeft(8, '0')
-                                  );
-
-                    IdNota.Append(oUtil.FncRetornaDigitoNota(IdNota));
-                    oNfe.infNfe = "NFe" + IdNota.ToString();
-                    oNfe.RefNf.cDV = oNfe.infNfe.Substring(oNfe.infNfe.Length - 1, 1);
-                    oNfe.Ide.cDV = oNfe.infNfe.Substring(oNfe.infNfe.Length - 1, 1);
-
-                    #region Parte Responsável selecionar os dados da empresa recebedora
-                    if (Dr.IsClosed == false)
-                    { Dr.Close(); }
-
-                    Dr = SqlHelper.ExecuteReader(cnnXmlValidacao2, "stpRetornaDadoCliente", IDNotaFiscal.ToString());
-
-                    if (Dr.Read())
-                    {
-                        oNfe.Dest.CNPJ = Dr["CNPJ"] is DBNull ? "0" : Dr["CNPJ"].ToString().Replace(".", "").Replace("/", "").Replace("-", "");
-                        oNfe.Dest.xNome = Dr["Empresa"] is DBNull ? string.Empty : oNfe.Util.FncRetiraCaracteresCampoTexto(Dr["Empresa"].ToString());
-                        oNfe.Dest.EnderDest.IE = Dr["IE"] is DBNull ? string.Empty : Dr["IE"].ToString();
-                        oNfe.Dest.EnderDest.xLgr = Dr["Flogradouro"] is DBNull ? string.Empty : (Dr["Flogradouro"].ToString().Length > 60 ? oNfe.Util.FncRetiraCaracteresCampoTexto(Dr["Flogradouro"].ToString().Substring(0, 60)) : oNfe.Util.FncRetiraCaracteresCampoTexto(Dr["Flogradouro"].ToString().Trim()));
-                        oNfe.Dest.EnderDest.nro = Dr["FNumero"] is DBNull ? string.Empty : Dr["FNumero"].ToString();
-                        oNfe.Dest.EnderDest.xBairro = Dr["FBairro"] is DBNull ? string.Empty : (Dr["FBairro"].ToString().Length > 60 ? Dr["FBairro"].ToString().Substring(0, 60) : Dr["FBairro"].ToString().Trim());
-                        oNfe.Dest.EnderDest.cMun = Dr["CodMunicipio"] is DBNull ? "0" : Dr["CodMunicipio"].ToString().PadLeft(7, '0');
-                        oNfe.Dest.EnderDest.xMun = Dr["FMunicipio"] is DBNull ? string.Empty : (Dr["FMunicipio"].ToString().Length > 60 ? Dr["FMunicipio"].ToString().Substring(0, 60) : Dr["FMunicipio"].ToString().Trim());
-                        oNfe.Dest.EnderDest.UF = Dr["FUF"] is DBNull ? string.Empty : Dr["FUF"].ToString().Length > 2 ? Dr["FUF"].ToString().Substring(0, 2) : Dr["FUF"].ToString().Trim();
-                        oNfe.Dest.EnderDest.UFCli = Dr["UFCli"] is DBNull ? string.Empty : Dr["UFCli"].ToString().Length > 2 ? Dr["UFCli"].ToString().Substring(0, 2) : Dr["UFCli"].ToString().Trim();
-                        oNfe.Dest.EnderDest.CEP = Dr["FCEP"] is DBNull ? string.Empty : Dr["FCEP"].ToString().Replace("-", "").Length > 8 ? Dr["FCEP"].ToString().Replace("-", "").Substring(0, 8) : Dr["FCEP"].ToString().Replace("-", "").Trim();
-                        oNfe.Dest.EnderDest.xCpl = Dr["FComplemento"] is DBNull ? string.Empty : (Dr["FComplemento"].ToString().Length > 60 ? Dr["FComplemento"].ToString().Trim().Substring(0, 60) : Dr["FComplemento"].ToString());
-                        oNfe.Dest.EnderDest.fone = Dr["Telefone"] is DBNull ? string.Empty : oNfe.Util.FUNC_CARACTER_ESPECIAL(Dr["Telefone"].ToString()).Trim();
-                        oNfe.Dest.EnderDest.cPais = Dr["CodPais"] is DBNull ? string.Empty : Dr["CodPais"].ToString().Trim();
-                        oNfe.Dest.EnderDest.xPais = Dr["Pais"] is DBNull ? string.Empty : oUtil.FncRetiraCaracteresCampoTexto(Dr["Pais"].ToString()).TrimStart().TrimEnd();
-
-                        //NEW VERSÃO 4.01 NFe!
-                        oNfe.Dest.email = Dr["EmailNFe"] is DBNull ? string.Empty : Dr["EmailNFe"].ToString();
-                    }
-                    Dr.Close();
- 
-                    #endregion
-
-                    //#region Parte Responsável selecionar os dados de entrega da empresa recebedora
-                    //Dr = SqlHelper.ExecuteReader(Conexao, "stpRetornaDadoClienteEntrega", oNfe.IDCliente);
-
-                    //if (Dr.Read())
-                    //{
-                    //    oNfe.Entregas.CNPJ = Dr["CNPJ"] is DBNull ? "0" : Dr["CNPJ"].ToString().Replace(".", "").Replace("/", "").PadLeft(14, '0').Replace("-", "");
-                    //    oNfe.Entregas.xLgr = Dr["ELogradouro"] is DBNull ? string.Empty : (Dr["ELogradouro"].ToString().Length > 60 ? Dr["ELogradouro"].ToString().Substring(0, 60) : Dr["ELogradouro"].ToString().Trim());
-                    //    oNfe.Entregas.nro = Dr["ENumero"] is DBNull ? string.Empty : Dr["ENumero"].ToString();
-                    //    oNfe.Entregas.xBairro = Dr["EBairro"] is DBNull ? string.Empty : (Dr["EBairro"].ToString().Length > 60 ? Dr["EBairro"].ToString().Substring(0, 60) : Dr["EBairro"].ToString().Trim());
-                    //    oNfe.Entregas.cMun = Dr["CodMunicipio"] is DBNull ? string.Empty : Dr["CodMunicipio"].ToString().PadLeft(7, '0');
-                    //    oNfe.Entregas.xMun = Dr["EMunicipio"] is DBNull ? string.Empty : (Dr["EMunicipio"].ToString().Length > 60 ? Dr["EMunicipio"].ToString().Substring(0, 60) : Dr["EMunicipio"].ToString().Trim());
-                    //    oNfe.Entregas.UF = Dr["EUF"] is DBNull ? string.Empty : Dr["EUF"].ToString().Length > 2 ? Dr["EUF"].ToString().Substring(0, 2) : Dr["EUF"].ToString().Trim();
-                    //}
-
-                    //Dr.Close();
-
-                    //#endregion
-
-                    #endregion
-
-                    #region Propriedades Versão 3.10
-                    oNfe.Ide.idDest = DrValidacao["idDest"] is DBNull ? "0" : DrValidacao["idDest"].ToString();
-                    oNfe.Ide.indFinal = DrValidacao["indFinal"] is DBNull ? "0" : DrValidacao["indFinal"].ToString();
-                    oNfe.Ide.indPres = DrValidacao["indPres"] is DBNull ? "0" : DrValidacao["indPres"].ToString();
-                    oNfe.Dest.indIEDest = DrValidacao["indIEDest"] is DBNull ? "0" : DrValidacao["indIEDest"].ToString();
-                    oNfe.RefNf.NfeReferenciada = DrValidacao["NfeReferenciada"] is DBNull ? "" : DrValidacao["NfeReferenciada"].ToString();
-                    #endregion
-                    
-                    String strXml = GeraXML(oNfe);
-                    String strFullName = ConfigurationManager.AppSettings["PastaXMLValidacao"].ToString() + oNfe.cNF + ".xml";
-
-                    if (!Directory.Exists(ConfigurationManager.AppSettings["PastaXMLValidacao"].ToString()))
-                        Directory.CreateDirectory(ConfigurationManager.AppSettings["PastaXMLValidacao"].ToString());
-
-                    using (StreamWriter ArquivoErro = new StreamWriter(strFullName, false, Encoding.UTF8))
-                    {
-                        ArquivoErro.WriteLine(strXml.ToString());
-                    }
-
-                    RetValidacao = oUtil.ValidaSchemaXML(strFullName, ConfigurationManager.AppSettings["PathSchemaNfe"].ToString());
-
-                    File.Delete(strFullName);
-                }
-
-                DrValidacao.Close();
-
-                if (DrValidacao.IsClosed == false)
-                { DrValidacao.Close(); }
-                
-            }
-            catch (Exception ex)
-            {
-                StreamWriter ArquivoErro = new StreamWriter(ConfigurationManager.AppSettings["PastaErro"].ToString() + IDNotaFiscal.ToString() + "_" + DateTime.Now.ToString("ddMMyyyyhhmmss") + "_XmlValidacao.txt", false, Encoding.ASCII);
-                ArquivoErro.WriteLine("***************** VALIAÇÃO XML *****************");
-                ArquivoErro.WriteLine("Erro gerado " + DateTime.Now.ToString());
-                ArquivoErro.WriteLine("IDNota: " + IDNotaFiscal.ToString());
-                ArquivoErro.WriteLine(ex.Message);
-                ArquivoErro.WriteLine(ex.ToString());
-                ArquivoErro.Flush();
-                ArquivoErro.Close();
-            }
-            finally
-            {
-                if (cnnXmlValidacao.State == ConnectionState.Open)
-                {
-                    cnnXmlValidacao.Close();
-                    cnnXmlValidacao.Dispose();
-                }
-                if (cnnXmlValidacao2.State == ConnectionState.Open)
-                {
-                    cnnXmlValidacao2.Close();
-                    cnnXmlValidacao2.Dispose();
-                }
-            }
-
-            return RetValidacao;
-            
-        }
-
         public String GeraXML(NotaFiscalEletronica oNfe)
         {
             StringBuilder infoLote = new StringBuilder();
@@ -408,7 +72,7 @@ namespace NFE.Classes.NFE
             }
             catch (Exception ex)
             {
-                StreamWriter ArquivoErro = new StreamWriter(ConfigurationManager.AppSettings["PastaErro"].ToString() + oNfe.cNF + "_" + DateTime.Now.ToString("ddMMyyyyhhmmss") + "_X509Certificate2.txt", false, Encoding.ASCII);
+                StreamWriter ArquivoErro = new StreamWriter(pastaErro + oNfe.cNF + "_" + DateTime.Now.ToString("ddMMyyyyhhmmss") + "_X509Certificate2.txt", false, Encoding.ASCII);
                 ArquivoErro.WriteLine("***************** CertAssina X509Certificate2 *****************");
                 ArquivoErro.WriteLine("Erro gerado " + DateTime.Now.ToString());
                 ArquivoErro.WriteLine("IDNota: " + oNfe.cNF);
@@ -765,7 +429,7 @@ namespace NFE.Classes.NFE
                 //oNfe.Det.Ipost.II.vIOF = Dr["vIOF"] is DBNull ? 0 : decimal.Parse(Dr["vIOF"].ToString());
 
                 // PIS 
-                oNfe.Det.Ipost.Pis.CST = Dr["CodPIS"] is DBNull ? "" : Dr["CodPIS"].ToString();
+                    oNfe.Det.Ipost.Pis.CST = Dr["CodPIS"] is DBNull ? "" : Dr["CodPIS"].ToString();
                     oNfe.Det.Ipost.Pis.vBC = Dr["BasePIS"] is DBNull ? 0 : decimal.Parse(Dr["BasePIS"].ToString());
                     oNfe.Det.Ipost.Pis.vPis = Dr["vPIS"] is DBNull ? 0 : decimal.Parse(Dr["vPIS"].ToString());
                     oNfe.Det.Ipost.Pis.pPIS = Dr["AliqPIS"] is DBNull ? 0 : decimal.Parse(Dr["AliqPIS"].ToString());
@@ -1217,7 +881,7 @@ namespace NFE.Classes.NFE
             #endregion
 
             #region ..:: total ::..
-            oNfe.IcmsTot.vProd = VLProduto;
+                oNfe.IcmsTot.vProd = VLProduto;
                 oNfe.IcmsTot.vST = vICMSST;
                 oNfe.IcmsTot.vBC = VBC;
                 oNfe.IcmsTot.vICMS = vICMS;
@@ -1299,7 +963,7 @@ namespace NFE.Classes.NFE
 
                 Dr.Close();
  
-            XML.Append("<transp>");
+                XML.Append("<transp>");
                 XML.Append("<modFrete>" + oNfe.TRansp.modFrete + "</modFrete>");
 
                 if (!(oNfe.TRansp.IdTransportadora == 0))
@@ -1459,15 +1123,15 @@ namespace NFE.Classes.NFE
                     XML.Append("<vPag>0.00</vPag>");
                 }
 
-                //if (oNfe.Pag.tPag.ToString() == "03" || oNfe.Pag.tPag.ToString() == "04")
-                //{
-                //    XML.Append("<card>");
-                //    XML.Append("<tpIntegra>2</tpIntegra>");
-                //    XML.Append("<CNPJ>" + oNfe.Pag.CNPJ.ToString() + "</CNPJ >");
-                //    XML.Append("<tBand>" + oNfe.Pag.tBand.ToString() + "</tBand>");
-                //    XML.Append("<cAut></cAut>");
-                //    XML.Append("</card>");
-                //}
+                if (oNfe.Pag.tPag.ToString() == "03" || oNfe.Pag.tPag.ToString() == "04")
+                {
+                    XML.Append("<card>");
+                    XML.Append("<tpIntegra>2</tpIntegra>");
+                    XML.Append("<CNPJ>" + oNfe.Pag.CNPJ.ToString() + "</CNPJ >");
+                    XML.Append("<tBand>" + oNfe.Pag.tBand.ToString() + "</tBand>");
+                    //XML.Append("<cAut></cAut>");
+                    XML.Append("</card>");
+                }
 
                 if (oNfe.Pag.tPag != "90")
                 {
@@ -1556,7 +1220,7 @@ namespace NFE.Classes.NFE
             }
             catch (Exception ex)
             {
-                StreamWriter ArquivoErro = new StreamWriter(ConfigurationManager.AppSettings["PastaErro"].ToString() + oNfe.cNF + "_" + DateTime.Now.ToString("ddMMyyyyhhmmss") + "_AssinaNfe.txt", false, Encoding.ASCII);
+                StreamWriter ArquivoErro = new StreamWriter(pastaErro + oNfe.cNF + "_" + DateTime.Now.ToString("ddMMyyyyhhmmss") + "_AssinaNfe.txt", false, Encoding.ASCII);
                 ArquivoErro.WriteLine("***************** Assina Nfe *****************");
                 ArquivoErro.WriteLine("Erro gerado " + DateTime.Now.ToString());
                 ArquivoErro.WriteLine("IDNota: " + oNfe.cNF);
@@ -1584,125 +1248,134 @@ namespace NFE.Classes.NFE
             string[] parametros;
             SqlConnection cnnMontaXML = new SqlConnection(Conexao);
             SqlConnection cnnMontaXML2 = new SqlConnection(Conexao);
+            string strAmbiente = ConfigurationManager.AppSettings["Ambiente"].ToString();
+
+            // Coloque isso antes de qualquer chamada ao webservice
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
 
             try
             {
 
-                #region Parte Responsável por formar o ID do cabeçalho da Nota e acrescentar o digito no mesmo
-
-                Dr = SqlHelper.ExecuteReader(cnnMontaXML, "stpRetornaParametrosNFE", null);
-
-                if (Dr.Read())
-                {
-                    oNfe.cUf = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
-                    oNfe.CNPJ = Dr["cnpj"] is DBNull ? "0".PadLeft(14, '0') : Dr["cnpj"].ToString();
-                    oNfe.mod = Dr["mod"] is DBNull ? "0" : Dr["mod"].ToString();
-                    //oNfe.serie = Dr["serie"] is DBNull ? "0" : Dr["serie"].ToString();
-
-                    oNfe.Det.Ipost.Pis.CST = Dr["PisCST"] is DBNull ? "01" : Dr["PisCST"].ToString();
-                    oNfe.Det.Ipost.Cofins.CST = Dr["CofinsCST"] is DBNull ? "01" : Dr["CofinsCST"].ToString();
-                    /*     O Campo ICMS 00 tem os valroes abaixo
-                           0 – Nacional;
-                           1 – Estrangeira – Importação direta;
-                           2 – Estrangeira – Adquirida no
-                           mercado interno.*/
-
-                    oNfe.Det.Ipost.Ipi.clEnq = Dr["IPIClasseEnquadramento"] is DBNull ? "999" : Dr["IPIClasseEnquadramento"].ToString();
-                    oNfe.Det.Ipost.Ipi.cEnq = Dr["IPICodEnquadramento"] is DBNull ? "999" : Dr["IPICodEnquadramento"].ToString();
-                                        
-                    oNfe.Det.Ipost.Icms.ICMs00.CST = Dr["ICMSCst"] is DBNull ? "00" : Dr["ICMSCst"].ToString();
-                    oNfe.Det.Ipost.Icms.ICMs00.modBC = Dr["ModBC"] is DBNull ? "3" : Dr["ModBC"].ToString();
-                                       
-                    oNfe.Det.Ipost.Icms.ICMs20.CST = Dr["ICMS20CST"] is DBNull ? 20 : decimal.Parse(Dr["ICMS20CST"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs20.modBC = Dr["ICMS20ModBC"] is DBNull ? 3 : decimal.Parse(Dr["ICMS20ModBC"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs20.pRedBC = Dr["ICMS20pRedBC"] is DBNull ? 0 : decimal.Parse(Dr["ICMS20pRedBC"].ToString());
-                                        
-                    oNfe.Det.Ipost.Icms.ICMs40.CST = Dr["ICMS40CST"] is DBNull ? 40 : decimal.Parse(Dr["ICMS40CST"].ToString());
-
-                    //NEW - VALORES DE CST PARA GRUPO ICMS40!!
-                    oNfe.Det.Ipost.Icms.ICMs40.CST41 = Dr["ICMS41CST"] is DBNull ? 41 : float.Parse(Dr["ICMS41CST"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs40.CST50 = Dr["ICMS50CST"] is DBNull ? 50 : float.Parse(Dr["ICMS50CST"].ToString());
-                                        
-                    oNfe.Det.Ipost.Icms.ICMs51.CST = Dr["ICMS51CST"] is DBNull ? 51 : decimal.Parse(Dr["ICMS51CST"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs51.modBC = Dr["ICMS51ModBC"] is DBNull ? 3 : decimal.Parse(Dr["ICMS51ModBC"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs51.pRedBC = Dr["ICMS51pRedBC"] is DBNull ? 0 : decimal.Parse(Dr["ICMS51pRedBC"].ToString());
-                                        
-                    oNfe.Det.Ipost.Icms.ICMs70.CST = Dr["ICMS70CST"] is DBNull ? 51 : decimal.Parse(Dr["ICMS70CST"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs70.modBC = Dr["ICMS70ModBC"] is DBNull ? 3 : decimal.Parse(Dr["ICMS70ModBC"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs70.pRedBC = Dr["ICMS70pRedBC"] is DBNull ? 0 : decimal.Parse(Dr["ICMS70pRedBC"].ToString());
-
-                    //ICMS60CST - Valor padrão
-                    oNfe.Det.Ipost.Icms.ICMs60.CST = Dr["ICMSCst"] is DBNull ? "00" : Dr["ICMSCst"].ToString();
-
-                    oNfe.RefNf.cUF = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
-                    oNfe.RefNf.CNPJ = Dr["cnpj"] is DBNull ? string.Empty : Dr["cnpj"].ToString();
-                    oNfe.RefNf.tpImp = Dr["tpImp"] is DBNull ? "1" : Dr["tpImp"].ToString();
-                    oNfe.RefNf.tpAmb = ConfigurationManager.AppSettings["Ambiente"].ToString();
-
-                    oNfe.RefNf.procEmi = Dr["procEmiss"] is DBNull ? "0" : Dr["procEmiss"].ToString();
-                    oNfe.RefNf.AAMM = DateTime.Now.ToString("yyMM");
-                    oNfe.RefNf.mod = Dr["refNFMod"] is DBNull ? "01" : Dr["refNFMod"].ToString();
-                    oNfe.RefNf.serie = Dr["refNFSerie"] is DBNull ? "0" : Dr["refNFSerie"].ToString();
-
-                    oNfe.Ide.Mod = Dr["mod"] is DBNull ? "55" : Dr["mod"].ToString();
-                    oNfe.Ide.tpImp = Dr["tpImp"] is DBNull ? 1 : int.Parse(Dr["tpImp"].ToString());
-                    oNfe.Ide.tpEmis = Dr["tpEmis"] is DBNull ? "1" : Dr["tpEmis"].ToString();
-                    oNfe.Ide.Serie = Dr["serie"] is DBNull ? "0" : Dr["serie"].ToString();
-                    oNfe.Ide.tpAmb = ConfigurationManager.AppSettings["Ambiente"].ToString();
-                    oNfe.Ide.procEmi = Dr["procEmiss"] is DBNull ? "0" : Dr["procEmiss"].ToString();
-                    //oNfe.Ide.dSaiEnt = DateTime.Now.ToString("yyyy-MM-dd");
-                    oNfe.Ide.verProc = Dr["VerProc"] is DBNull ? "NF-eletronica.com" : Dr["VerProc"].ToString();
-                    oNfe.Ide.cUF = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
-                    oNfe.Ide.cMunFG = Dr["cMunFg"] is DBNull ? 0 : int.Parse(Dr["cMunFg"].ToString());
-                    oNfe.Ide.tpImp = Dr["tpImp"] is DBNull ? 1 : int.Parse(Dr["tpImp"].ToString());
-                    //oNfe.Ide.tpEmis = Dr["tpEmis"] is DBNull ? "1" : Dr["tpEmis"].ToString();
-                    //oNfe.Ide.indPag = Dr["IndPag"] is DBNull ? 0 : int.Parse(Dr["IndPag"].ToString());
-
-                    //NEW VERSÃO NFe 4.01!
-
-                    oNfe.Ide.dhCont = Dr["dhCont"] is DBNull ? string.Empty : string.Format("{0:yyyy-MM-ddTHH:mm:ss}{1}", Convert.ToDateTime(Dr["dhCont"].ToString()).AddMinutes(-3), TimeZone.CurrentTimeZone.GetUtcOffset(Convert.ToDateTime(Dr["dhCont"].ToString())).ToString().Substring(0, 6)); 
-                    oNfe.Ide.xJust = Dr["xJust"] is DBNull ? string.Empty : Dr["xJust"].ToString();
-
-                    oNfe.Emit.EnderEmit.cMun = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
-                    oNfe.Emit.EnderEmit.xPais = Dr["DescPais"] is DBNull ? string.Empty : Dr["DescPais"].ToString();
-                    oNfe.Emit.EnderEmit.cPais = Dr["CodPais"] is DBNull ? string.Empty : Dr["CodPais"].ToString();
-
-                    oNfe.Dest.EnderDest.xPais = Dr["DescPais"] is DBNull ? string.Empty : Dr["DescPais"].ToString();
-                    oNfe.Dest.EnderDest.cPais = Dr["CodPais"] is DBNull ? string.Empty : Dr["CodPais"].ToString();
-                }
-                Dr.Close();
-
-                oNfe.AAMM = DateTime.Now.ToString("yyMM");
-
-                #endregion
-
-                #region Parte Responsável selecionar os dados da empresa Emissora
-
-                Dr = SqlHelper.ExecuteReader(cnnMontaXML, "stpRetornaDadosEmpresa", null);
-
-                if (Dr.Read())
-                {
-                    oNfe.Emit.CNPJ = Dr["CNPJ"] is DBNull ? "0" : Dr["CNPJ"].ToString().Replace(".", "").Replace("/", "").PadLeft(14, '0').Replace("-", "");
-                    oNfe.Emit.xNome = Dr["Empresa"] is DBNull ? string.Empty : Dr["Empresa"].ToString();
-                    oNfe.Emit.xFant = Dr["Fantasia"] is DBNull ? string.Empty : Dr["Fantasia"].ToString();
-                    oNfe.Emit.EnderEmit.IE = Dr["IE"] is DBNull ? string.Empty : Dr["IE"].ToString();
-                    oNfe.Emit.EnderEmit.xLgr = Dr["Endereco"] is DBNull ? string.Empty : (Dr["Endereco"].ToString().Length > 60 ? Dr["Endereco"].ToString().Substring(0, 60) : Dr["Endereco"].ToString().Trim());
-                    oNfe.Emit.EnderEmit.nro = Dr["Numero"] is DBNull ? string.Empty : Dr["Numero"].ToString();
-                    oNfe.Emit.EnderEmit.xCpl = Dr["Complemento"] is DBNull ? string.Empty : Dr["Complemento"].ToString();
-                    oNfe.Emit.EnderEmit.xBairro = Dr["Bairro"] is DBNull ? string.Empty : (Dr["Bairro"].ToString().Length > 60 ? Dr["Bairro"].ToString().Substring(0, 60) : Dr["Bairro"].ToString().Trim());
-                    oNfe.Emit.EnderEmit.cMun = Dr["CodMunicipio"] is DBNull ? string.Empty : Dr["CodMunicipio"].ToString().PadLeft(7, '0');
-                    oNfe.Emit.EnderEmit.xMun = Dr["Municipio"] is DBNull ? string.Empty : (Dr["Municipio"].ToString().Length > 60 ? Dr["Municipio"].ToString().Substring(0, 60) : Dr["Municipio"].ToString().Trim());
-                    oNfe.Emit.EnderEmit.UF = Dr["UF"] is DBNull ? string.Empty : Dr["UF"].ToString().Length > 2 ? Dr["UF"].ToString().Substring(0, 2) : Dr["UF"].ToString().Trim();
-                    oNfe.Emit.EnderEmit.CEP = Dr["CEP"] is DBNull ? string.Empty : Dr["CEP"].ToString().Replace("-", "").Length > 8 ? Dr["CEP"].ToString().Replace("-", "").Substring(0, 8) : Dr["CEP"].ToString().Replace("-", "").Trim();
-                    oNfe.Emit.EnderEmit.fone = Dr["Telefone"] is DBNull ? string.Empty : Dr["Telefone"].ToString().Replace(".", "").Replace("/", "").Replace("(", "").Replace(")", "").Replace(" ", "").Trim();
-                }
-                Dr.Close();
-
-                #endregion
-
                 #region Parte Responsável por selecionar as informações da tabela de notas
 
                 DrNotas = SqlHelper.ExecuteReader(cnnMontaXML, "stpRetornaNotaFiscal", null); // Lista Notas Fiscais
+
+                if (DrNotas.HasRows)
+                {
+                    #region Parte Responsável por formar o ID do cabeçalho da Nota e acrescentar o digito no mesmo
+
+                    Dr = SqlHelper.ExecuteReader(cnnMontaXML2, "stpRetornaParametrosNFE", null);
+
+                    if (Dr.Read())
+                    {
+                        oNfe.cUf = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
+                        oNfe.CNPJ = Dr["cnpj"] is DBNull ? "0".PadLeft(14, '0') : Dr["cnpj"].ToString();
+                        oNfe.mod = Dr["mod"] is DBNull ? "0" : Dr["mod"].ToString();
+                        //oNfe.serie = Dr["serie"] is DBNull ? "0" : Dr["serie"].ToString();
+
+                        oNfe.Det.Ipost.Pis.CST = Dr["PisCST"] is DBNull ? "01" : Dr["PisCST"].ToString();
+                        oNfe.Det.Ipost.Cofins.CST = Dr["CofinsCST"] is DBNull ? "01" : Dr["CofinsCST"].ToString();
+                        /*     O Campo ICMS 00 tem os valroes abaixo
+                               0 – Nacional;
+                               1 – Estrangeira – Importação direta;
+                               2 – Estrangeira – Adquirida no
+                               mercado interno.*/
+
+                        oNfe.Det.Ipost.Ipi.clEnq = Dr["IPIClasseEnquadramento"] is DBNull ? "999" : Dr["IPIClasseEnquadramento"].ToString();
+                        oNfe.Det.Ipost.Ipi.cEnq = Dr["IPICodEnquadramento"] is DBNull ? "999" : Dr["IPICodEnquadramento"].ToString();
+
+                        oNfe.Det.Ipost.Icms.ICMs00.CST = Dr["ICMSCst"] is DBNull ? "00" : Dr["ICMSCst"].ToString();
+                        oNfe.Det.Ipost.Icms.ICMs00.modBC = Dr["ModBC"] is DBNull ? "3" : Dr["ModBC"].ToString();
+
+                        oNfe.Det.Ipost.Icms.ICMs20.CST = Dr["ICMS20CST"] is DBNull ? 20 : decimal.Parse(Dr["ICMS20CST"].ToString());
+                        oNfe.Det.Ipost.Icms.ICMs20.modBC = Dr["ICMS20ModBC"] is DBNull ? 3 : decimal.Parse(Dr["ICMS20ModBC"].ToString());
+                        oNfe.Det.Ipost.Icms.ICMs20.pRedBC = Dr["ICMS20pRedBC"] is DBNull ? 0 : decimal.Parse(Dr["ICMS20pRedBC"].ToString());
+
+                        oNfe.Det.Ipost.Icms.ICMs40.CST = Dr["ICMS40CST"] is DBNull ? 40 : decimal.Parse(Dr["ICMS40CST"].ToString());
+
+                        //NEW - VALORES DE CST PARA GRUPO ICMS40!!
+                        oNfe.Det.Ipost.Icms.ICMs40.CST41 = Dr["ICMS41CST"] is DBNull ? 41 : float.Parse(Dr["ICMS41CST"].ToString());
+                        oNfe.Det.Ipost.Icms.ICMs40.CST50 = Dr["ICMS50CST"] is DBNull ? 50 : float.Parse(Dr["ICMS50CST"].ToString());
+
+                        oNfe.Det.Ipost.Icms.ICMs51.CST = Dr["ICMS51CST"] is DBNull ? 51 : decimal.Parse(Dr["ICMS51CST"].ToString());
+                        oNfe.Det.Ipost.Icms.ICMs51.modBC = Dr["ICMS51ModBC"] is DBNull ? 3 : decimal.Parse(Dr["ICMS51ModBC"].ToString());
+                        oNfe.Det.Ipost.Icms.ICMs51.pRedBC = Dr["ICMS51pRedBC"] is DBNull ? 0 : decimal.Parse(Dr["ICMS51pRedBC"].ToString());
+
+                        oNfe.Det.Ipost.Icms.ICMs70.CST = Dr["ICMS70CST"] is DBNull ? 51 : decimal.Parse(Dr["ICMS70CST"].ToString());
+                        oNfe.Det.Ipost.Icms.ICMs70.modBC = Dr["ICMS70ModBC"] is DBNull ? 3 : decimal.Parse(Dr["ICMS70ModBC"].ToString());
+                        oNfe.Det.Ipost.Icms.ICMs70.pRedBC = Dr["ICMS70pRedBC"] is DBNull ? 0 : decimal.Parse(Dr["ICMS70pRedBC"].ToString());
+
+                        //ICMS60CST - Valor padrão
+                        oNfe.Det.Ipost.Icms.ICMs60.CST = Dr["ICMSCst"] is DBNull ? "00" : Dr["ICMSCst"].ToString();
+
+                        oNfe.RefNf.cUF = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
+                        oNfe.RefNf.CNPJ = Dr["cnpj"] is DBNull ? string.Empty : Dr["cnpj"].ToString();
+                        oNfe.RefNf.tpImp = Dr["tpImp"] is DBNull ? "1" : Dr["tpImp"].ToString();
+                        oNfe.RefNf.tpAmb = strAmbiente;
+
+                        oNfe.RefNf.procEmi = Dr["procEmiss"] is DBNull ? "0" : Dr["procEmiss"].ToString();
+                        oNfe.RefNf.AAMM = DateTime.Now.ToString("yyMM");
+                        oNfe.RefNf.mod = Dr["refNFMod"] is DBNull ? "01" : Dr["refNFMod"].ToString();
+                        oNfe.RefNf.serie = Dr["refNFSerie"] is DBNull ? "0" : Dr["refNFSerie"].ToString();
+
+                        oNfe.Ide.Mod = Dr["mod"] is DBNull ? "55" : Dr["mod"].ToString();
+                        oNfe.Ide.tpImp = Dr["tpImp"] is DBNull ? 1 : int.Parse(Dr["tpImp"].ToString());
+                        oNfe.Ide.tpEmis = Dr["tpEmis"] is DBNull ? "1" : Dr["tpEmis"].ToString();
+                        oNfe.Ide.Serie = Dr["serie"] is DBNull ? "0" : Dr["serie"].ToString();
+                        oNfe.Ide.tpAmb = strAmbiente;
+                        oNfe.Ide.procEmi = Dr["procEmiss"] is DBNull ? "0" : Dr["procEmiss"].ToString();
+                        //oNfe.Ide.dSaiEnt = DateTime.Now.ToString("yyyy-MM-dd");
+                        oNfe.Ide.verProc = Dr["VerProc"] is DBNull ? "NF-eletronica.com" : Dr["VerProc"].ToString();
+                        oNfe.Ide.cUF = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
+                        oNfe.Ide.cMunFG = Dr["cMunFg"] is DBNull ? 0 : int.Parse(Dr["cMunFg"].ToString());
+                        oNfe.Ide.tpImp = Dr["tpImp"] is DBNull ? 1 : int.Parse(Dr["tpImp"].ToString());
+                        //oNfe.Ide.tpEmis = Dr["tpEmis"] is DBNull ? "1" : Dr["tpEmis"].ToString();
+                        //oNfe.Ide.indPag = Dr["IndPag"] is DBNull ? 0 : int.Parse(Dr["IndPag"].ToString());
+
+                        //NEW VERSÃO NFe 4.01!
+
+                        oNfe.Ide.dhCont = Dr["dhCont"] is DBNull ? string.Empty : string.Format("{0:yyyy-MM-ddTHH:mm:ss}{1}", Convert.ToDateTime(Dr["dhCont"].ToString()).AddMinutes(-3), TimeZone.CurrentTimeZone.GetUtcOffset(Convert.ToDateTime(Dr["dhCont"].ToString())).ToString().Substring(0, 6));
+                        oNfe.Ide.xJust = Dr["xJust"] is DBNull ? string.Empty : Dr["xJust"].ToString();
+
+                        oNfe.Emit.EnderEmit.cMun = Dr["Cuf"] is DBNull ? "0" : Dr["Cuf"].ToString();
+                        oNfe.Emit.EnderEmit.xPais = Dr["DescPais"] is DBNull ? string.Empty : Dr["DescPais"].ToString();
+                        oNfe.Emit.EnderEmit.cPais = Dr["CodPais"] is DBNull ? string.Empty : Dr["CodPais"].ToString();
+
+                        oNfe.Dest.EnderDest.xPais = Dr["DescPais"] is DBNull ? string.Empty : Dr["DescPais"].ToString();
+                        oNfe.Dest.EnderDest.cPais = Dr["CodPais"] is DBNull ? string.Empty : Dr["CodPais"].ToString();
+                    }
+                    Dr.Close();
+
+                    oNfe.AAMM = DateTime.Now.ToString("yyMM");
+
+                    #endregion
+
+                    #region Parte Responsável selecionar os dados da empresa Emissora
+
+                    Dr = SqlHelper.ExecuteReader(cnnMontaXML2, "stpRetornaDadosEmpresa", null);
+
+                    if (Dr.Read())
+                    {
+                        oNfe.Emit.CNPJ = Dr["CNPJ"] is DBNull ? "0" : Dr["CNPJ"].ToString().Replace(".", "").Replace("/", "").PadLeft(14, '0').Replace("-", "");
+                        oNfe.Emit.xNome = Dr["Empresa"] is DBNull ? string.Empty : Dr["Empresa"].ToString();
+                        oNfe.Emit.xFant = Dr["Fantasia"] is DBNull ? string.Empty : Dr["Fantasia"].ToString();
+                        oNfe.Emit.EnderEmit.IE = Dr["IE"] is DBNull ? string.Empty : Dr["IE"].ToString();
+                        oNfe.Emit.EnderEmit.xLgr = Dr["Endereco"] is DBNull ? string.Empty : (Dr["Endereco"].ToString().Length > 60 ? Dr["Endereco"].ToString().Substring(0, 60) : Dr["Endereco"].ToString().Trim());
+                        oNfe.Emit.EnderEmit.nro = Dr["Numero"] is DBNull ? string.Empty : Dr["Numero"].ToString();
+                        oNfe.Emit.EnderEmit.xCpl = Dr["Complemento"] is DBNull ? string.Empty : Dr["Complemento"].ToString();
+                        oNfe.Emit.EnderEmit.xBairro = Dr["Bairro"] is DBNull ? string.Empty : (Dr["Bairro"].ToString().Length > 60 ? Dr["Bairro"].ToString().Substring(0, 60) : Dr["Bairro"].ToString().Trim());
+                        oNfe.Emit.EnderEmit.cMun = Dr["CodMunicipio"] is DBNull ? string.Empty : Dr["CodMunicipio"].ToString().PadLeft(7, '0');
+                        oNfe.Emit.EnderEmit.xMun = Dr["Municipio"] is DBNull ? string.Empty : (Dr["Municipio"].ToString().Length > 60 ? Dr["Municipio"].ToString().Substring(0, 60) : Dr["Municipio"].ToString().Trim());
+                        oNfe.Emit.EnderEmit.UF = Dr["UF"] is DBNull ? string.Empty : Dr["UF"].ToString().Length > 2 ? Dr["UF"].ToString().Substring(0, 2) : Dr["UF"].ToString().Trim();
+                        oNfe.Emit.EnderEmit.CEP = Dr["CEP"] is DBNull ? string.Empty : Dr["CEP"].ToString().Replace("-", "").Length > 8 ? Dr["CEP"].ToString().Replace("-", "").Substring(0, 8) : Dr["CEP"].ToString().Replace("-", "").Trim();
+                        oNfe.Emit.EnderEmit.fone = Dr["Telefone"] is DBNull ? string.Empty : Dr["Telefone"].ToString().Replace(".", "").Replace("/", "").Replace("(", "").Replace(")", "").Replace(" ", "").Trim();
+                    }
+                    Dr.Close();
+
+                    #endregion
+
+
+                }
 
                 while (DrNotas.Read())
                 {
@@ -1817,7 +1490,7 @@ namespace NFE.Classes.NFE
                     #endregion
 
                     string RetornoRecepcao = string.Empty;
-                                       
+
                     // ############################################################################################
                     // 5 – Contingência FS-DA - emissão em contingência com impressão do DANFE em Formulário de 
                     //     Segurança para Impressão de Documento Auxiliar de Documento Fiscal Eletrônico (FS-DA).
@@ -1825,16 +1498,16 @@ namespace NFE.Classes.NFE
                     // Caso o Tipo de Emissão for 5, o XML é gravado porém não é enviado p/ nenhum servidor
                     // para validação.
                     // ############################################################################################
-                    
+
                     if (oNfe.Ide.tpEmis == "5")
                     {
                         string[] ParamsCont = {
-                                              "7",          
-                                             oNfe.cNF,       
-                                             null,          
-                                             null,          
-                                             null,          
-                                             null,    
+                                              "7",
+                                             oNfe.cNF,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
                                              null,
                                              oNfe.infNfe.Substring(3, oNfe.infNfe.Length - 3),
                                              null,
@@ -1847,22 +1520,22 @@ namespace NFE.Classes.NFE
                         // Gera historico
                         Observacao = "FS-DA (Formulário de Segurança)";
                         string[] ParamHistorico = {
-                                                    "8",          
-                                                    oNfe.cNF,       
-                                                    "2",          
-                                                    null,          
-                                                    null,          
-                                                    null,    
+                                                    "8",
+                                                    oNfe.cNF,
+                                                    "2",
+                                                    null,
+                                                    null,
+                                                    null,
                                                     null,
                                                     null,
                                                     oNfe.Ide.tpEmis,
                                                     Observacao
                                                 };
                         SqlHelper.ExecuteNonQuery(cnnMontaXML2, "StpNfe", ParamHistorico);
-                     }
+                    }
                     else
                     {
-                        if (ConfigurationManager.AppSettings["Ambiente"].ToString() == "2")
+                        if (ConfigurationManager.AppSettings["Ambiente"].ToString() == "2") //Ambiente de HOMOLOGAÇÃO
                         {
                             if (oNfe.Ide.tpEmis == "1") // 1-Normal
                             {
@@ -1880,7 +1553,7 @@ namespace NFE.Classes.NFE
                                 //RetornoRecepcao = objSCANRecepcao.nfeRecepcaoLote(oCabecalho.FncRetornaCabecalho(), infoLote.ToString());
                             }
                         }
-                        else
+                        else  //Ambiente de PRODUÇÃO
                         {
                             if (oNfe.Ide.tpEmis == "1") // 1-Normal
                             {
@@ -1918,23 +1591,51 @@ namespace NFE.Classes.NFE
                             parametros = null;
                             parametros = new string[] { nRec.ToString(), oNfe.Ide.cNF.ToString(), oNfe.infNfe.Substring(3, oNfe.infNfe.Length - 3), "2", "null" };
                             SqlHelper.ExecuteNonQuery(cnnMontaXML2, "stpAtualizaRecNfe", parametros);
- 
+
                             Observacao = "StatusNFe: 2, nRec: " + nRec.ToString() + ", cNF: " + oNfe.Ide.cNF.ToString() + ", infNfe: " + oNfe.infNfe.ToString();
 
                             string[] ParamHistorico = {
-                                                        "8",          
-                                                        oNfe.cNF,       
-                                                        "2",          
-                                                        null,          
-                                                        null,          
-                                                        null,    
+                                                        "8",
+                                                        oNfe.cNF,
+                                                        "2",
+                                                        null,
+                                                        null,
+                                                        null,
                                                         null,
                                                         null,
                                                         oNfe.Ide.tpEmis,
                                                         Observacao
                                                     };
                             SqlHelper.ExecuteNonQuery(cnnMontaXML2, "StpNfe", ParamHistorico);
-                         }
+                        }
+                        else if (cStat == "104")// Lote Processado - Aqui provavelmente ocorreu alguma rejeição, pois a nf-e não foi aprovada
+                        {
+                            // Resgata os valores do Node 1                    
+                            cStat = objXml.GetElementsByTagName("cStat").Item(1).InnerXml.ToString();
+                            MotivoNfe = objXml.GetElementsByTagName("xMotivo").Item(1).InnerXml.ToString();
+                            dtRetorno = objXml.GetElementsByTagName("dhRecbto").Item(1).InnerXml.ToString();
+
+                            if (cStat == "100") // Autorizado o uso da NF-e
+                            {
+                                StatusNfe = "3";
+                                nProt = objXml.GetElementsByTagName("nProt").Item(0).InnerXml.ToString();
+
+                                string[] ParamAtualizaNfeAprova = { "2", oNfe.cNF, StatusNfe, cStat, MotivoNfe, nProt, dtRetorno == "" ? null : dtRetorno, null, null, null };
+                                SqlHelper.ExecuteNonQuery(cnnMontaXML2, "StpNfe", ParamAtualizaNfeAprova);
+
+                                // Gera Arquivo de Distribuição                           
+                                FncGeraXMLCliente(Convert.ToInt32(oNfe.cNF));
+
+                            }
+                            else //Se retorno qualquer outro cStat, a NFe foi rejeitada
+                            {
+                                // Atualiza o status da NFe para Rejeitada
+                                StatusNfe = "4"; // Rejeitada
+
+                                string[] ParamAtualizaNfe = { "2", oNfe.cNF, StatusNfe, cStat, MotivoNfe, nProt, dtRetorno == "" ? null : dtRetorno, null, null, null };
+                                SqlHelper.ExecuteNonQuery(cnnMontaXML2, "StpNfe", ParamAtualizaNfe);
+                            }
+                        }
                         else
                         {
                             string xMotivo = objXml.GetElementsByTagName("xMotivo").Item(0).InnerXml;
@@ -1951,7 +1652,7 @@ namespace NFE.Classes.NFE
              }
             catch (Exception ex)
             {
-                 StreamWriter ArquivoErro = new StreamWriter(ConfigurationManager.AppSettings["PastaErro"].ToString() + oNfe.cNF + "_" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".txt", false, Encoding.ASCII);
+                 StreamWriter ArquivoErro = new StreamWriter(pastaErro + oNfe.cNF + "_" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".txt", false, Encoding.ASCII);
                 ArquivoErro.WriteLine("***************** RECEPCAO *****************");
                 ArquivoErro.WriteLine("Erro gerado " + DateTime.Now.ToString());
                 ArquivoErro.WriteLine("IDNota: " + oNfe.cNF);
@@ -1981,6 +1682,48 @@ namespace NFE.Classes.NFE
                     cnnMontaXML2.Close();
                     cnnMontaXML2.Dispose();
                 }
+            }
+        }
+
+        public void FncGeraXMLCliente(Int32 intID)
+        {
+            XmlDocument XmlNfe = new XmlDocument();
+            XmlDocument XmlAutorizacao = new XmlDocument();
+            StringBuilder infoXmlCliente = new StringBuilder();
+            NFE.Objetos.NotaFiscalEletronica obj = new NFE.Objetos.NotaFiscalEletronica();
+            NFE.Objetos.Ret_Recepcao.RetRecepcao objRetRecepcao = new NFE.Objetos.Ret_Recepcao.RetRecepcao();
+
+            try
+            {
+                XmlNfe.Load(obj.PastaXMLRecepcao + intID + ".xml");
+
+                String XmlNfeAss = XmlNfe.GetElementsByTagName("NFe")[0].OuterXml;
+
+                XmlAutorizacao.Load(obj.PastaXMLRecepcaoRetorno + intID + ".xml");
+
+                infoXmlCliente.Append("<?xml version='1.0' encoding='" + ConfigurationManager.AppSettings["CodificacaoNFE"].ToString() + "' ?>");
+                infoXmlCliente.Append("<nfeProc xmlns='" + ConfigurationManager.AppSettings["NameSpaceNFE"].ToString() + "' versao='" + ConfigurationManager.AppSettings["VersaoDadosNFENova"].ToString() + "'>");
+                // Nfe Assinada                
+                infoXmlCliente.Append(XmlNfeAss);
+                // Retorno com autorização de uso
+                infoXmlCliente.Append(XmlAutorizacao.GetElementsByTagName("protNFe").Item(0).OuterXml);
+                infoXmlCliente.Append("</nfeProc>");
+
+                oUtil.FncGravaXML(infoXmlCliente, objRetRecepcao.PastaRetRecepcaoCliente + intID + ".xml");
+
+                //FncGeraPDF(ConfigurationManager.AppSettings["PastaPDF"], intID);
+
+            }
+            catch (Exception ex)
+            {
+                StreamWriter ArquivoErro = new StreamWriter(pastaErro + intID.ToString() + "_" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".txt", false, Encoding.ASCII);
+                ArquivoErro.WriteLine("***************** ERRO AO GERAR ARQUIVO DO CLIENTE *****************");
+                ArquivoErro.WriteLine("Erro gerado " + DateTime.Now.ToString());
+                ArquivoErro.WriteLine("IDNota: " + intID);
+                ArquivoErro.WriteLine(ex.Message);
+                ArquivoErro.WriteLine(ex.ToString());
+                ArquivoErro.Flush();
+                ArquivoErro.Close();
             }
         }
 

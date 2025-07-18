@@ -317,7 +317,7 @@ namespace NFE.Classes.NFE.Objetos
             set { _IDCliente = value; }
         }
 
-        string _indSinc = "0";
+        string _indSinc = "1";
         public string indSinc
         {
             get { return _indSinc; }

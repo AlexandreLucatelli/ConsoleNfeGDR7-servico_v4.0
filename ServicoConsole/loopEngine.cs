@@ -47,8 +47,6 @@ namespace ServicoConsole
 				// Recepcao Contingencia
 				oxmlNova.MontaXMLContingencia();
 
-				//oxmlNova.XmlValidacao(486);
-
 				// Carta de Correção
 				objCCe.FncCCe();
 				//}
