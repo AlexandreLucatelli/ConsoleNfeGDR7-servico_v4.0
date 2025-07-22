@@ -35,7 +35,7 @@ namespace ServicoConsole
 				#endregion
 
 				// RetRecepcao
-				objRetRecepcaoNova.FncRetRecepcao();
+				//objRetRecepcaoNova.FncRetRecepcao();
 
 				// Cancelamento
 				//objCancelamentoNova.FncCancelamento();

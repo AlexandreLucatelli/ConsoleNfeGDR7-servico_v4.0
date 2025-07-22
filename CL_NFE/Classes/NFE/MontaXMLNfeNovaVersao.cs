@@ -1499,7 +1499,7 @@ namespace NFE.Classes.NFE
                     // para validação.
                     // ############################################################################################
 
-                    if (oNfe.Ide.tpEmis == "5")
+                    if (oNfe.Ide.tpEmis == "5") // Modo Contingência
                     {
                         string[] ParamsCont = {
                                               "7",
@@ -1608,7 +1608,7 @@ namespace NFE.Classes.NFE
                                                     };
                             SqlHelper.ExecuteNonQuery(cnnMontaXML2, "StpNfe", ParamHistorico);
                         }
-                        else if (cStat == "104")// Lote Processado - Aqui provavelmente ocorreu alguma rejeição, pois a nf-e não foi aprovada
+                        else if (cStat == "104")// Lote Processado - Após atualizar para modo Síncrono, o retorno sempre deve cair aqui
                         {
                             // Resgata os valores do Node 1                    
                             cStat = objXml.GetElementsByTagName("cStat").Item(1).InnerXml.ToString();
