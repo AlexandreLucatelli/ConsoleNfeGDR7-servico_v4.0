@@ -227,9 +227,6 @@ namespace CL_NFE.Classes.EventoCancelamento.EventoCancelamento
         {
             X509Certificate Cert = new X509Certificate(Entity.CaminhoCert, Entity.SenhaCert);
 
-            //HomologacaoEvento.RecepcaoEvento objHomologEventoWS = new HomologacaoEvento.RecepcaoEvento();
-            //ProducaoEvento.RecepcaoEvento objProdEventoWS = new ProducaoEvento.RecepcaoEvento();
-
             HomoNFeRecepcaoEvento4.NFeRecepcaoEvento4 objHomologEventoWS = new HomoNFeRecepcaoEvento4.NFeRecepcaoEvento4();
             ProdNFeRecepcaoEvento4.NFeRecepcaoEvento4 objProdEventoWS = new ProdNFeRecepcaoEvento4.NFeRecepcaoEvento4(); 
 
@@ -262,7 +259,9 @@ namespace CL_NFE.Classes.EventoCancelamento.EventoCancelamento
             XmlTextReader xmlReader = new XmlTextReader(new StringReader(XMLEvento));
             XmlDocument xmlDocument = new XmlDocument();
             XmlNode nodeEnvio = xmlDocument.ReadNode(xmlReader);
-                        
+            // Atualizando versão do protocolo de segurança para Tls12, após atualização para .Net 4.5
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+
             if (Entity.tpAmb == (int)EntityEventoCancelamento.eTipoAmbiente.eHomologacao)
             {
                 //objHomologEventoWS.nfeCabecMsgValue = RetornaCabecalhoEventoHomolog();
@@ -467,6 +466,7 @@ namespace CL_NFE.Classes.EventoCancelamento.EventoCancelamento
             this.clParameter.Add("@ID", Entity.IDNF, typeof(Int64));
             this.clParameter.Add("@StatusNfe", StatusNfe, typeof(Int64));
             this.clParameter.Add("@tpEmis", Entity.tpEmis, typeof(Int64));
+            this.clParameter.Add("@Observacao", "Nf-e Cancelada", typeof(String));
 
             this.Db.ExecuteProcedure(sSQL, this.clParameter);
         }

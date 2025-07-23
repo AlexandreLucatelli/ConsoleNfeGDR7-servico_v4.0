@@ -53,7 +53,7 @@ namespace ConsoleNfeGDR7
                 oxmlNova.MontaXML();
 
                 // Recepcao Contingencia
-                oxmlNova.MontaXMLContingencia();
+                //oxmlNova.MontaXMLContingencia();
 
                 //oxmlNova.XmlValidacao(486);
 

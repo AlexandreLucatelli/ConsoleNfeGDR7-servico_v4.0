@@ -32,20 +32,19 @@ namespace ServicoConsole
 				#region GET VERSÃO E TIPO DE EMISSÃO!
 				string VersaoNfe = ConfigurationManager.AppSettings["VersaoNFe"].ToString();
 				string tpEmis = objUtil.FncVerificaTipoEmissao();
-				#endregion
+                #endregion
 
-				// RetRecepcao
-				//objRetRecepcaoNova.FncRetRecepcao();
+                // RetRecepcao
+                //objRetRecepcaoNova.FncRetRecepcao();
 
-				// Cancelamento
-				//objCancelamentoNova.FncCancelamento();
+                // Cancelamento
+                objEventoCancelamento.IniciaProcessoCancelamento();
 
-				objEventoCancelamento.IniciaProcessoCancelamento();
 				// Recepcao    
 				oxmlNova.MontaXML();
 
 				// Recepcao Contingencia
-				oxmlNova.MontaXMLContingencia();
+				//oxmlNova.MontaXMLContingencia();
 
 				// Carta de Correção
 				objCCe.FncCCe();

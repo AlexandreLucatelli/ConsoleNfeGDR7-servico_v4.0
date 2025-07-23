@@ -223,12 +223,6 @@ namespace NFE.Classes.NFE
 
                 #region ..:: dest ::..
 
-                if (oNfe.Dest.CNPJ == string.Empty)
-                {
-                    parametros = new string[] { "null", oNfe.Ide.cNF.ToString(), oNfe.infNfe.Substring(3, oNfe.infNfe.Length - 3), "4", "O Endereço do destinatário é inválido" };
-                    SqlHelper.ExecuteNonQuery(cnnGeraXML, "stpAtualizaRecNfe", parametros);
-            }
-
                 XML.Append("<dest>");
 
                 if (oNfe.Dest.EnderDest.UFCli == "EX")
@@ -1250,7 +1244,7 @@ namespace NFE.Classes.NFE
             SqlConnection cnnMontaXML2 = new SqlConnection(Conexao);
             string strAmbiente = ConfigurationManager.AppSettings["Ambiente"].ToString();
 
-            // Coloque isso antes de qualquer chamada ao webservice
+            // Atualizando versão do protocolo de segurança para Tls12, após atualização para .Net 4.5
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
 
             try
@@ -1620,7 +1614,7 @@ namespace NFE.Classes.NFE
                                 StatusNfe = "3";
                                 nProt = objXml.GetElementsByTagName("nProt").Item(0).InnerXml.ToString();
 
-                                string[] ParamAtualizaNfeAprova = { "2", oNfe.cNF, StatusNfe, cStat, MotivoNfe, nProt, dtRetorno == "" ? null : dtRetorno, null, null, null };
+                                string[] ParamAtualizaNfeAprova = { "2", oNfe.cNF, StatusNfe, cStat, MotivoNfe, nProt, dtRetorno == "" ? null : dtRetorno, IdNota.ToString(), null, null };
                                 SqlHelper.ExecuteNonQuery(cnnMontaXML2, "StpNfe", ParamAtualizaNfeAprova);
 
                                 // Gera Arquivo de Distribuição                           
@@ -1632,9 +1626,25 @@ namespace NFE.Classes.NFE
                                 // Atualiza o status da NFe para Rejeitada
                                 StatusNfe = "4"; // Rejeitada
 
-                                string[] ParamAtualizaNfe = { "2", oNfe.cNF, StatusNfe, cStat, MotivoNfe, nProt, dtRetorno == "" ? null : dtRetorno, null, null, null };
+                                string[] ParamAtualizaNfe = { "2", oNfe.cNF, StatusNfe, cStat, MotivoNfe, nProt, dtRetorno == "" ? null : dtRetorno, IdNota.ToString(), null, null };
                                 SqlHelper.ExecuteNonQuery(cnnMontaXML2, "StpNfe", ParamAtualizaNfe);
                             }
+                            // Gera o histórico da NFe
+                            Observacao = "StatusNFe: " + StatusNfe + "| cStat: " + cStat + "| MotivoNfe: " + MotivoNfe + "| nProt: " + nProt + "| dtRetorno: " + dtRetorno;
+
+                            string[] ParamHistorico = {
+                                                    "8",
+                                                    oNfe.cNF,
+                                                    StatusNfe,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    oNfe.Ide.tpEmis,
+                                                    Observacao
+                                                };
+                            SqlHelper.ExecuteNonQuery(Conexao, "StpNfe", ParamHistorico);
                         }
                         else
                         {
