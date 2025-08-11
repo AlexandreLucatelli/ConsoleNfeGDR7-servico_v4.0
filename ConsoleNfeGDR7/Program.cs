@@ -52,13 +52,14 @@ namespace ConsoleNfeGDR7
                 // Recepcao    
                 oxmlNova.MontaXML();
 
+                // Carta de Correção
+                objCCe.FncCCe();
+
                 // Recepcao Contingencia
                 //oxmlNova.MontaXMLContingencia();
 
                 //oxmlNova.XmlValidacao(486);
 
-                // Carta de Correção
-                objCCe.FncCCe();
                 //}
             }
             catch (Exception ex)

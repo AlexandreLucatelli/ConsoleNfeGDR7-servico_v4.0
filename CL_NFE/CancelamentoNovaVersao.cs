@@ -224,17 +224,17 @@ namespace NFE
 
                     #region ..:: Envio de Email ::..
 
-                    SqlDataReader drEmail;
-                    string[] ParamEmailNfe = { "5", IDNota, null, null, null, null, null, null, null, null };
-                    drEmail = SqlHelper.ExecuteReader(Conexao, "StpNfe", ParamEmailNfe);
+                    //SqlDataReader drEmail;
+                    //string[] ParamEmailNfe = { "5", IDNota, null, null, null, null, null, null, null, null };
+                    //drEmail = SqlHelper.ExecuteReader(Conexao, "StpNfe", ParamEmailNfe);
 
-                    if (drEmail.Read())
-                    {
-                        if (drEmail["EmailNFe"].ToString().Trim() != "")
-                        {
-                            objEmail.EnviaEmailCancelamento(drEmail["EmailNFe"].ToString(), drEmail["RazaoSocial"].ToString(), drEmail["Numero"].ToString(), drEmail["chNFe"].ToString(), IDNota);
-                        }
-                    }
+                    //if (drEmail.Read())
+                    //{
+                    //    if (drEmail["EmailNFe"].ToString().Trim() != "")
+                    //    {
+                    //        objEmail.EnviaEmailCancelamento(drEmail["EmailNFe"].ToString(), drEmail["RazaoSocial"].ToString(), drEmail["Numero"].ToString(), drEmail["chNFe"].ToString(), IDNota);
+                    //    }
+                    //}
 
                     #endregion
 

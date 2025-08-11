@@ -391,20 +391,20 @@ namespace NFE.Classes.NFE
                     // Grava arquivo de retorno
                     objUtil.FncGravaXML(RetornoXmlProcEvento, objCCe.PastaCCeCliente + iIDNF + ".xml");
 
-                    DR = SqlHelper.ExecuteReader(cnnMontaCCe, CommandType.Text, String.Format("EXEC stpNotasFiscais @intOperacao=1, @intID={0}", iIDNF.ToString()));
+                    //DR = SqlHelper.ExecuteReader(cnnMontaCCe, CommandType.Text, String.Format("EXEC stpNotasFiscais @intOperacao=1, @intID={0}", iIDNF.ToString()));
 
-                    if (DR.Read())
-                    {
-                        // Email Destinatário
-                        if (DR["EmailNfe"].ToString() != "")
-                            objEmail.EnviaEmailCCe(DR["EmailNfe"].ToString(), DR["RazaoSocial"].ToString(), DR["NumeroNF"].ToString(), DR["ChaveNFE"].ToString(), iIDNF.ToString());
+                    //if (DR.Read())
+                    //{
+                    //    // Email Destinatário
+                    //    if (DR["EmailNfe"].ToString() != "")
+                    //        objEmail.EnviaEmailCCe(DR["EmailNfe"].ToString(), DR["RazaoSocial"].ToString(), DR["NumeroNF"].ToString(), DR["ChaveNFE"].ToString(), iIDNF.ToString());
 
-                        // Email Transportadora
-                        if (DR["EmailTransportadora"].ToString() != "")
-                            objEmail.EnviaEmailCCe(DR["EmailTransportadora"].ToString(), DR["RazaoSocial"].ToString(), DR["NumeroNF"].ToString(), DR["ChaveNFE"].ToString(), iIDNF.ToString());
+                    //    // Email Transportadora
+                    //    if (DR["EmailTransportadora"].ToString() != "")
+                    //        objEmail.EnviaEmailCCe(DR["EmailTransportadora"].ToString(), DR["RazaoSocial"].ToString(), DR["NumeroNF"].ToString(), DR["ChaveNFE"].ToString(), iIDNF.ToString());
 
-                    }
-                    DR.Close();
+                    //}
+                    //DR.Close();
                 }
 
                 #endregion

@@ -1674,14 +1674,9 @@ namespace NFE.Classes.NFE
             }
             finally
             {
-                if (!DrNotas.IsClosed)
-                {
-                    DrNotas.Close();
-                }
-                if (!Dr.IsClosed)
-                {
-                    Dr.Close();
-                }
+                DrNotas?.Close();
+                Dr?.Close();
+
                 if (cnnMontaXML.State == ConnectionState.Open)
                 {
                     cnnMontaXML.Close();
