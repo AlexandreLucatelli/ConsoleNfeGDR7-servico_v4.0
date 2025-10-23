@@ -121,7 +121,7 @@ namespace NFE.Classes.NFE.Objetos
 
                            
                            oNfe.TRansp.Vol.qVol = Dr["Volumes"] is DBNull ? "0" : Dr["Volumes"].ToString();
-                           oNfe.TRansp.Vol.esp = Dr["Especie"] is DBNull ? string.Empty : Dr["Especie"].ToString();
+                           oNfe.TRansp.Vol.esp = Dr["Especie"] is DBNull ? "Volumes" : Dr["Especie"].ToString();
                            oNfe.TRansp.Vol.marca = Dr["Marca"] is DBNull ? string.Empty : Dr["Marca"].ToString();
                            oNfe.TRansp.Vol.pesoL = Dr["PesoLiquido"] is DBNull ? 0 : decimal.Parse(Dr["PesoLiquido"].ToString());
                            oNfe.TRansp.Vol.pesoB = Dr["PesoBruto"] is DBNull ? 0 : decimal.Parse(Dr["PesoBruto"].ToString());
