@@ -2,12 +2,14 @@
 using NFE.Classes.AcessoDados;
 using NFE.Classes.NFE.Assinatura;
 using NFE.Classes.NFE.Objetos;
+using NFE.Classes.NFE.Objetos.Recepcao.Det.Impostos;
 using NFE.Classes.Util;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Gdr7.DBClass;
 using System.Gdr7.Util;
 using System.IO;
 using System.Net;
@@ -638,53 +640,57 @@ namespace NFE.Classes.NFE
                 int Contator = 1;
 
                 decimal vICMS = 0,
-                       VLProduto = 0,
-                       VLFrete = 0,
-                       VLSeguro = 0,
-                       VLDesconto = 0,
-                       VBC = 0,
-                       OutrasDespesas = 0,
-                       VLIPI = 0,
-                       VLPIS = 0,
-                       VLCOFINS = 0,
-                       VLII = 0,
-                       vBCST = 0,
-                       vICMSST = 0;
+                        VLProduto = 0,
+                        VLFrete = 0,
+                        VLSeguro = 0,
+                        VLDesconto = 0,
+                        VBC = 0,
+                        OutrasDespesas = 0,
+                        VLIPI = 0,
+                        VLPIS = 0,
+                        VLCOFINS = 0,
+                        VLII = 0,
+                        vBCST = 0,
+                        vICMSST = 0,
+                        VLBCIBSCBS = 0,
+                        VLIBSUF = 0,
+                        VLIBSMun = 0,
+                        VLCBS = 0;
 
-                while (Dr.Read())
-                {
-                    oNfe.Det.Ipost.Icms.ICMs00.orig = Dr["SitTributA"] is DBNull ? "0" : Dr["SitTributA"].ToString();
-                    oNfe.Det.Ipost.Icms.ICMs10.orig = Dr["SitTributA"] is DBNull ? "0" : Dr["SitTributA"].ToString();
-                    oNfe.Det.Ipost.Icms.ICMs20.orig = Dr["SitTributA"] is DBNull ? 0 : decimal.Parse(Dr["SitTributA"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs40.orig = Dr["SitTributA"] is DBNull ? 0 : decimal.Parse(Dr["SitTributA"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs51.orig = Dr["SitTributA"] is DBNull ? 0 : decimal.Parse(Dr["SitTributA"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs60.orig = Dr["SitTributA"] is DBNull ? "0" : Dr["SitTributA"].ToString();
-                    oNfe.Det.Ipost.Icms.ICMs70.orig = Dr["SitTributA"] is DBNull ? 0 : decimal.Parse(Dr["SitTributA"].ToString());
-                    oNfe.Det.Ipost.Icms.ICMs90.orig = Dr["SitTributA"] is DBNull ? "0" : Dr["SitTributA"].ToString();
+            while (Dr.Read())
+            {
+                oNfe.Det.Ipost.Icms.ICMs00.orig = Dr["SitTributA"] is DBNull ? "0" : Dr["SitTributA"].ToString();
+                oNfe.Det.Ipost.Icms.ICMs10.orig = Dr["SitTributA"] is DBNull ? "0" : Dr["SitTributA"].ToString();
+                oNfe.Det.Ipost.Icms.ICMs20.orig = Dr["SitTributA"] is DBNull ? 0 : decimal.Parse(Dr["SitTributA"].ToString());
+                oNfe.Det.Ipost.Icms.ICMs40.orig = Dr["SitTributA"] is DBNull ? 0 : decimal.Parse(Dr["SitTributA"].ToString());
+                oNfe.Det.Ipost.Icms.ICMs51.orig = Dr["SitTributA"] is DBNull ? 0 : decimal.Parse(Dr["SitTributA"].ToString());
+                oNfe.Det.Ipost.Icms.ICMs60.orig = Dr["SitTributA"] is DBNull ? "0" : Dr["SitTributA"].ToString();
+                oNfe.Det.Ipost.Icms.ICMs70.orig = Dr["SitTributA"] is DBNull ? 0 : decimal.Parse(Dr["SitTributA"].ToString());
+                oNfe.Det.Ipost.Icms.ICMs90.orig = Dr["SitTributA"] is DBNull ? "0" : Dr["SitTributA"].ToString();
 
                 oNfe.Det.Produto.cProd = Dr["IDProduto"] is DBNull ? "0" : Dr["IDProduto"].ToString();
-                    oNfe.Det.Produto.xProd = Dr["Descricao"] is DBNull ? string.Empty : Dr["Descricao"].ToString();
+                oNfe.Det.Produto.xProd = Dr["Descricao"] is DBNull ? string.Empty : Dr["Descricao"].ToString();
 
-                    //INCLUÍDO 29/11/2011!!                        
-                    string Xped = Dr["NumeroPedidoCliente"] is DBNull ? string.Empty : oNfe.Util.FUNC_CARACTER_ESPECIAL(System.Text.RegularExpressions.Regex.Replace(Dr["NumeroPedidoCliente"].ToString(), "<[^<>]+>", String.Empty).Replace("\n", String.Empty).Replace("\r", String.Empty));
+                //INCLUÍDO 29/11/2011!!                        
+                string Xped = Dr["NumeroPedidoCliente"] is DBNull ? string.Empty : oNfe.Util.FUNC_CARACTER_ESPECIAL(System.Text.RegularExpressions.Regex.Replace(Dr["NumeroPedidoCliente"].ToString(), "<[^<>]+>", String.Empty).Replace("\n", String.Empty).Replace("\r", String.Empty));
 
-                    oNfe.Det.Produto.xPed = Xped.Length > 15 ? Xped.TrimEnd().TrimStart().Substring(0, 15).TrimEnd().TrimStart() : Xped.TrimEnd().TrimStart();
+                oNfe.Det.Produto.xPed = Xped.Length > 15 ? Xped.TrimEnd().TrimStart().Substring(0, 15).TrimEnd().TrimStart() : Xped.TrimEnd().TrimStart();
 
-                    oNfe.Det.Produto.NCM = Dr["IDNCM"] is DBNull ? string.Empty : Dr["IDNCM"].ToString().PadLeft(8, '0');
-                    oNfe.Det.Produto.CEST = Dr["CEST"] is DBNull ? "0" : Dr["CEST"].ToString();
-                    oNfe.Det.Produto.CFOP = Dr["CFop"] is DBNull ? string.Empty : Dr["CFop"].ToString().PadLeft(4, '0');
-                    oNfe.Det.Produto.uCom = Dr["Unidade"] is DBNull ? string.Empty : Dr["Unidade"].ToString();
-                    oNfe.Det.Produto.qCom = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
-                    oNfe.Det.Produto.vUnCom = Dr["Vlunitario"] is DBNull ? 0 : decimal.Parse(Dr["Vlunitario"].ToString());
-                    oNfe.Det.Produto.vUnTrib = Dr["Vlunitario"] is DBNull ? 0 : decimal.Parse(Dr["Vlunitario"].ToString());
-                    oNfe.Det.Produto.vProd = Dr["ValorTotal"] is DBNull ? 0 : decimal.Parse(Dr["ValorTotal"].ToString());
-                    oNfe.Det.Produto.vFrete = Dr["ValorFrete"] is DBNull ? 0 : decimal.Parse(Dr["ValorFrete"].ToString());
-                    oNfe.Det.Produto.vSeg = Dr["ValorSeguro"] is DBNull ? 0 : decimal.Parse(Dr["ValorSeguro"].ToString());
-                    oNfe.Det.Produto.uTrib = Dr["unidade"] is DBNull ? "UN" : Dr["unidade"].ToString();
-                    oNfe.Det.Produto.qTrib = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
-                    oNfe.Det.Produto.vDesc = Dr["Desconto"] is DBNull ? 0 : decimal.Parse(Dr["Desconto"].ToString());
-                    oNfe.Det.Produto.SitTributB = Dr["SitTributB"] is DBNull ? "00" : Dr["SitTributB"].ToString();
-                    oNfe.Det.Produto.vOutras = Dr["OutrasDespesas"] is DBNull ? 0 : decimal.Parse(Dr["OutrasDespesas"].ToString());
+                oNfe.Det.Produto.NCM = Dr["IDNCM"] is DBNull ? string.Empty : Dr["IDNCM"].ToString().PadLeft(8, '0');
+                oNfe.Det.Produto.CEST = Dr["CEST"] is DBNull ? "0" : Dr["CEST"].ToString();
+                oNfe.Det.Produto.CFOP = Dr["CFop"] is DBNull ? string.Empty : Dr["CFop"].ToString().PadLeft(4, '0');
+                oNfe.Det.Produto.uCom = Dr["Unidade"] is DBNull ? string.Empty : Dr["Unidade"].ToString();
+                oNfe.Det.Produto.qCom = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
+                oNfe.Det.Produto.vUnCom = Dr["Vlunitario"] is DBNull ? 0 : decimal.Parse(Dr["Vlunitario"].ToString());
+                oNfe.Det.Produto.vUnTrib = Dr["Vlunitario"] is DBNull ? 0 : decimal.Parse(Dr["Vlunitario"].ToString());
+                oNfe.Det.Produto.vProd = Dr["ValorTotal"] is DBNull ? 0 : decimal.Parse(Dr["ValorTotal"].ToString());
+                oNfe.Det.Produto.vFrete = Dr["ValorFrete"] is DBNull ? 0 : decimal.Parse(Dr["ValorFrete"].ToString());
+                oNfe.Det.Produto.vSeg = Dr["ValorSeguro"] is DBNull ? 0 : decimal.Parse(Dr["ValorSeguro"].ToString());
+                oNfe.Det.Produto.uTrib = Dr["unidade"] is DBNull ? "UN" : Dr["unidade"].ToString();
+                oNfe.Det.Produto.qTrib = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
+                oNfe.Det.Produto.vDesc = Dr["Desconto"] is DBNull ? 0 : decimal.Parse(Dr["Desconto"].ToString());
+                oNfe.Det.Produto.SitTributB = Dr["SitTributB"] is DBNull ? "00" : Dr["SitTributB"].ToString();
+                oNfe.Det.Produto.vOutras = Dr["OutrasDespesas"] is DBNull ? 0 : decimal.Parse(Dr["OutrasDespesas"].ToString());
 
                 // II - TAG de grupo do Imposto de Importação
                 //oNfe.Det.Ipost.II.vBC = Dr["BaseII"] is DBNull ? 0 : decimal.Parse(Dr["BaseII"].ToString());
@@ -693,76 +699,77 @@ namespace NFE.Classes.NFE
                 //oNfe.Det.Ipost.II.vIOF = Dr["vIOF"] is DBNull ? 0 : decimal.Parse(Dr["vIOF"].ToString());
 
                 // PIS 
-                    oNfe.Det.Ipost.Pis.CST = Dr["CodPIS"] is DBNull ? "" : Dr["CodPIS"].ToString();
-                    oNfe.Det.Ipost.Pis.vBC = Dr["BasePIS"] is DBNull ? 0 : decimal.Parse(Dr["BasePIS"].ToString());
-                    oNfe.Det.Ipost.Pis.vPis = Dr["vPIS"] is DBNull ? 0 : decimal.Parse(Dr["vPIS"].ToString());
-                    oNfe.Det.Ipost.Pis.pPIS = Dr["AliqPIS"] is DBNull ? 0 : decimal.Parse(Dr["AliqPIS"].ToString());
-                    oNfe.Det.Ipost.Pis.qBCProd = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
-                    oNfe.Det.Ipost.Pis.vAliqProd = 0;
+                oNfe.Det.Ipost.Pis.CST = Dr["CodPIS"] is DBNull ? "" : Dr["CodPIS"].ToString();
+                oNfe.Det.Ipost.Pis.vBC = Dr["BasePIS"] is DBNull ? 0 : decimal.Parse(Dr["BasePIS"].ToString());
+                oNfe.Det.Ipost.Pis.vPis = Dr["vPIS"] is DBNull ? 0 : decimal.Parse(Dr["vPIS"].ToString());
+                oNfe.Det.Ipost.Pis.pPIS = Dr["AliqPIS"] is DBNull ? 0 : decimal.Parse(Dr["AliqPIS"].ToString());
+                oNfe.Det.Ipost.Pis.qBCProd = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
+                oNfe.Det.Ipost.Pis.vAliqProd = 0;
 
-                    // Cofins
-                    oNfe.Det.Ipost.Cofins.CST = Dr["CodCOFINS"] is DBNull ? "" : Dr["CodCOFINS"].ToString();
-                    oNfe.Det.Ipost.Cofins.vBC = Dr["BaseCOFINS"] is DBNull ? 0 : decimal.Parse(Dr["BaseCOFINS"].ToString());
-                    oNfe.Det.Ipost.Cofins.vCOFINS = Dr["vCOFINS"] is DBNull ? 0 : decimal.Parse(Dr["vCOFINS"].ToString());
-                    oNfe.Det.Ipost.Cofins.pCOFINS = Dr["AliqCOFINS"] is DBNull ? 0 : decimal.Parse(Dr["AliqCOFINS"].ToString());
-                    oNfe.Det.Ipost.Cofins.qBCProd = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
-                    oNfe.Det.Ipost.Cofins.vAliqProd = 0;
+                // Cofins
+                oNfe.Det.Ipost.Cofins.CST = Dr["CodCOFINS"] is DBNull ? "" : Dr["CodCOFINS"].ToString();
+                oNfe.Det.Ipost.Cofins.vBC = Dr["BaseCOFINS"] is DBNull ? 0 : decimal.Parse(Dr["BaseCOFINS"].ToString());
+                oNfe.Det.Ipost.Cofins.vCOFINS = Dr["vCOFINS"] is DBNull ? 0 : decimal.Parse(Dr["vCOFINS"].ToString());
+                oNfe.Det.Ipost.Cofins.pCOFINS = Dr["AliqCOFINS"] is DBNull ? 0 : decimal.Parse(Dr["AliqCOFINS"].ToString());
+                oNfe.Det.Ipost.Cofins.qBCProd = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
+                oNfe.Det.Ipost.Cofins.vAliqProd = 0;
 
-                    //IPI
-                    oNfe.Det.Ipost.Ipi.IPITrib.vBC = Dr["BaseIPI"] is DBNull ? 0 : decimal.Parse(Dr["BaseIPI"].ToString());
-                    oNfe.Det.Ipost.Ipi.IPITrib.pIPI = Dr["AliqIPI"] is DBNull ? 0 : decimal.Parse(Dr["AliqIPI"].ToString());
-                    oNfe.Det.Ipost.Ipi.IPITrib.vIPI = Dr["TotalIPI"] is DBNull ? 0 : decimal.Parse(Dr["TotalIPI"].ToString());
-                    oNfe.Det.Ipost.Ipi.IPITrib.CST = Dr["SitTribIPI"] is DBNull ? "50" : Dr["SitTribIPI"].ToString();
+                //IPI
+                oNfe.Det.Ipost.Ipi.IPITrib.vBC = Dr["BaseIPI"] is DBNull ? 0 : decimal.Parse(Dr["BaseIPI"].ToString());
+                oNfe.Det.Ipost.Ipi.IPITrib.pIPI = Dr["AliqIPI"] is DBNull ? 0 : decimal.Parse(Dr["AliqIPI"].ToString());
+                oNfe.Det.Ipost.Ipi.IPITrib.vIPI = Dr["TotalIPI"] is DBNull ? 0 : decimal.Parse(Dr["TotalIPI"].ToString());
+                oNfe.Det.Ipost.Ipi.IPITrib.CST = Dr["SitTribIPI"] is DBNull ? "50" : Dr["SitTribIPI"].ToString();
 
-                    if (oNfe.Det.Produto.SitTributB == "00")
-                    {
-                        oNfe.Det.Ipost.Icms.ICMs00.vBC = Dr["BaseICMS"] is DBNull ? 0 : decimal.Parse(Dr["BaseICMS"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs00.pICMS = Dr["AliqICMS"] is DBNull ? 0 : decimal.Parse(Dr["AliqICMS"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs00.vICMS = Dr["ValorICMS"] is DBNull ? 0 : decimal.Parse(Dr["ValorICMS"].ToString());
+                //ICMS - Início
+                if (oNfe.Det.Produto.SitTributB == "00")
+                {
+                    oNfe.Det.Ipost.Icms.ICMs00.vBC = Dr["BaseICMS"] is DBNull ? 0 : decimal.Parse(Dr["BaseICMS"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs00.pICMS = Dr["AliqICMS"] is DBNull ? 0 : decimal.Parse(Dr["AliqICMS"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs00.vICMS = Dr["ValorICMS"] is DBNull ? 0 : decimal.Parse(Dr["ValorICMS"].ToString());
 
-                        vICMS += (oNfe.Det.Ipost.Icms.ICMs00.vICMS);
-                        VBC += (oNfe.Det.Ipost.Icms.ICMs00.vBC);
+                    vICMS += (oNfe.Det.Ipost.Icms.ICMs00.vICMS);
+                    VBC += (oNfe.Det.Ipost.Icms.ICMs00.vBC);
 
-                    }
-                    else if (oNfe.Det.Produto.SitTributB == "10")
-                    {
-                        oNfe.Det.Ipost.Icms.ICMs10.CST = "10";
-                        oNfe.Det.Ipost.Icms.ICMs10.modBC = Dr["modBC"] is DBNull ? "" : Dr["modBC"].ToString();
-                        oNfe.Det.Ipost.Icms.ICMs10.vBC = Dr["BaseICMS"] is DBNull ? 0 : decimal.Parse(Dr["BaseICMS"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs10.pICMS = Dr["AliqICMS"] is DBNull ? 0 : decimal.Parse(Dr["AliqICMS"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs10.vICMS = Dr["ValorICMS"] is DBNull ? 0 : decimal.Parse(Dr["ValorICMS"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs10.modBCST = Dr["modBCST"] is DBNull ? "" : Dr["modBCST"].ToString();
-                        oNfe.Det.Ipost.Icms.ICMs10.pMVAST = Dr["pMVAST"] is DBNull ? 0 : decimal.Parse(Dr["pMVAST"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs10.pRedBCST = Dr["pRedBCST"] is DBNull ? 0 : decimal.Parse(Dr["pRedBCST"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs10.vBCST = Dr["vBCST"] is DBNull ? 0 : decimal.Parse(Dr["vBCST"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs10.pICMSST = Dr["pICMSST"] is DBNull ? 0 : decimal.Parse(Dr["pICMSST"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs10.vICMSST = Dr["vICMSST"] is DBNull ? 0 : decimal.Parse(Dr["vICMSST"].ToString());
+                }
+                else if (oNfe.Det.Produto.SitTributB == "10")
+                {
+                    oNfe.Det.Ipost.Icms.ICMs10.CST = "10";
+                    oNfe.Det.Ipost.Icms.ICMs10.modBC = Dr["modBC"] is DBNull ? "" : Dr["modBC"].ToString();
+                    oNfe.Det.Ipost.Icms.ICMs10.vBC = Dr["BaseICMS"] is DBNull ? 0 : decimal.Parse(Dr["BaseICMS"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs10.pICMS = Dr["AliqICMS"] is DBNull ? 0 : decimal.Parse(Dr["AliqICMS"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs10.vICMS = Dr["ValorICMS"] is DBNull ? 0 : decimal.Parse(Dr["ValorICMS"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs10.modBCST = Dr["modBCST"] is DBNull ? "" : Dr["modBCST"].ToString();
+                    oNfe.Det.Ipost.Icms.ICMs10.pMVAST = Dr["pMVAST"] is DBNull ? 0 : decimal.Parse(Dr["pMVAST"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs10.pRedBCST = Dr["pRedBCST"] is DBNull ? 0 : decimal.Parse(Dr["pRedBCST"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs10.vBCST = Dr["vBCST"] is DBNull ? 0 : decimal.Parse(Dr["vBCST"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs10.pICMSST = Dr["pICMSST"] is DBNull ? 0 : decimal.Parse(Dr["pICMSST"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs10.vICMSST = Dr["vICMSST"] is DBNull ? 0 : decimal.Parse(Dr["vICMSST"].ToString());
 
-                        vICMS += (oNfe.Det.Ipost.Icms.ICMs10.vICMS);
-                        VBC += (oNfe.Det.Ipost.Icms.ICMs10.vBC);
-                        vBCST += (oNfe.Det.Ipost.Icms.ICMs10.vBCST);
-                        vICMSST += oNfe.Det.Ipost.Icms.ICMs10.vICMSST;
+                    vICMS += (oNfe.Det.Ipost.Icms.ICMs10.vICMS);
+                    VBC += (oNfe.Det.Ipost.Icms.ICMs10.vBC);
+                    vBCST += (oNfe.Det.Ipost.Icms.ICMs10.vBCST);
+                    vICMSST += oNfe.Det.Ipost.Icms.ICMs10.vICMSST;
 
-                    }
-                    else if (oNfe.Det.Produto.SitTributB == "20")
-                    {
-                        oNfe.Det.Ipost.Icms.ICMs20.vBC = Dr["BaseICMS"] is DBNull ? 0 : decimal.Parse(Dr["BaseICMS"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs20.pICMS = Dr["AliqICMS"] is DBNull ? 0 : decimal.Parse(Dr["AliqICMS"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs20.vICMS = Dr["ValorICMS"] is DBNull ? 0 : decimal.Parse(Dr["ValorICMS"].ToString());
+                }
+                else if (oNfe.Det.Produto.SitTributB == "20")
+                {
+                    oNfe.Det.Ipost.Icms.ICMs20.vBC = Dr["BaseICMS"] is DBNull ? 0 : decimal.Parse(Dr["BaseICMS"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs20.pICMS = Dr["AliqICMS"] is DBNull ? 0 : decimal.Parse(Dr["AliqICMS"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs20.vICMS = Dr["ValorICMS"] is DBNull ? 0 : decimal.Parse(Dr["ValorICMS"].ToString());
 
-                        vICMS += (oNfe.Det.Ipost.Icms.ICMs20.vICMS);
-                        VBC += (oNfe.Det.Ipost.Icms.ICMs20.vBC);
+                    vICMS += (oNfe.Det.Ipost.Icms.ICMs20.vICMS);
+                    VBC += (oNfe.Det.Ipost.Icms.ICMs20.vBC);
 
-                    }
-                    else if (oNfe.Det.Produto.SitTributB == "51")
-                    {
-                        oNfe.Det.Ipost.Icms.ICMs51.vBC = Dr["BaseICMS"] is DBNull ? 0 : decimal.Parse(Dr["BaseICMS"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs51.pICMS = Dr["AliqICMS"] is DBNull ? 0 : decimal.Parse(Dr["AliqICMS"].ToString());
-                        oNfe.Det.Ipost.Icms.ICMs51.vICMS = Dr["ValorICMS"] is DBNull ? 0 : decimal.Parse(Dr["ValorICMS"].ToString());
+                }
+                else if (oNfe.Det.Produto.SitTributB == "51")
+                {
+                    oNfe.Det.Ipost.Icms.ICMs51.vBC = Dr["BaseICMS"] is DBNull ? 0 : decimal.Parse(Dr["BaseICMS"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs51.pICMS = Dr["AliqICMS"] is DBNull ? 0 : decimal.Parse(Dr["AliqICMS"].ToString());
+                    oNfe.Det.Ipost.Icms.ICMs51.vICMS = Dr["ValorICMS"] is DBNull ? 0 : decimal.Parse(Dr["ValorICMS"].ToString());
 
-                        vICMS += (oNfe.Det.Ipost.Icms.ICMs51.vICMS);
-                        VBC += (oNfe.Det.Ipost.Icms.ICMs51.vBC);
-                    }
+                    vICMS += (oNfe.Det.Ipost.Icms.ICMs51.vICMS);
+                    VBC += (oNfe.Det.Ipost.Icms.ICMs51.vBC);
+                }
                 else if (oNfe.Det.Produto.SitTributB == "90")
                 {
                     oNfe.Det.Ipost.Icms.ICMs90.CST = "90";
@@ -782,174 +789,188 @@ namespace NFE.Classes.NFE
                     vBCST += (oNfe.Det.Ipost.Icms.ICMs90.vBCST);
                     vICMSST += oNfe.Det.Ipost.Icms.ICMs90.vICMSST;
                 }
+                //ICMS - Fim
+
+                //IBS/CBS
+                oNfe.Det.Ipost.IBSCBS.CST = Dr["CSTIBS"] is DBNull ? "" : Dr["CSTIBS"].ToString();
+                oNfe.Det.Ipost.IBSCBS.cClassTrib = Dr["cClassTrib"] is DBNull ? "" : Dr["cClassTrib"].ToString();
+                oNfe.Det.Ipost.IBSCBS.vBC = Dr["vBC"] is DBNull ? 0 : decimal.Parse(Dr["vBC"].ToString());
+                oNfe.Det.Ipost.IBSCBS.pIBSUF = Dr["pIBSUF"] is DBNull ? 0 : decimal.Parse(Dr["pIBSUF"].ToString());
+                oNfe.Det.Ipost.IBSCBS.vIBSUF = Dr["vIBSUF"] is DBNull ? 0 : decimal.Parse(Dr["vIBSUF"].ToString());
+                oNfe.Det.Ipost.IBSCBS.pIBSMun = Dr["pIBSMun"] is DBNull ? 0 : decimal.Parse(Dr["pIBSMun"].ToString());
+                oNfe.Det.Ipost.IBSCBS.vIBSMun = Dr["vIBSMun"] is DBNull ? 0 : decimal.Parse(Dr["vIBSMun"].ToString());
+                oNfe.Det.Ipost.IBSCBS.vIBS = Dr["vIBS"] is DBNull ? 0 : decimal.Parse(Dr["vIBS"].ToString());
+                oNfe.Det.Ipost.IBSCBS.pCBS = Dr["pCBS"] is DBNull ? 0 : decimal.Parse(Dr["pCBS"].ToString());
+                oNfe.Det.Ipost.IBSCBS.vCBS = Dr["vCBS"] is DBNull ? 0 : decimal.Parse(Dr["vCBS"].ToString());
+
+                //Totais
+                VLProduto += oNfe.Det.Produto.vProd;
+                VLFrete += oNfe.Det.Produto.vFrete;
+                VLSeguro += oNfe.Det.Produto.vSeg;
+                VLDesconto += oNfe.Det.Produto.vDesc;
+                VLIPI += oNfe.Det.Ipost.Ipi.IPITrib.vIPI;
+                VLPIS += oNfe.Det.Ipost.Pis.vPis;
+                VLCOFINS += oNfe.Det.Ipost.Cofins.vCOFINS;
+                VLII += oNfe.Det.Ipost.II.vII;
+
+                oNfe.IcmsTot.vNF = (VLProduto + VLFrete + OutrasDespesas + VLSeguro + VLIPI + vICMSST) - VLDesconto;
+
+                OutrasDespesas += Dr["OutrasDespesas"] is DBNull ? 0 : decimal.Parse(Dr["OutrasDespesas"].ToString());
+
+                if (oNfe.Det.Produto.cProd == string.Empty || oNfe.Det.Produto.cProd == "0")
+                {
+                    parametros = new string[] { "null", oNfe.Ide.cNF.ToString(), oNfe.infNfe.Substring(3, oNfe.infNfe.Length - 3), "4", "Não existe produtos associados a esse número de nota" };
+                }
 
                 oNfe.Det.nItem = Contator.ToString();
 
-                    VLProduto += oNfe.Det.Produto.vProd;
-                    VLFrete += oNfe.Det.Produto.vFrete;
-                    VLSeguro += oNfe.Det.Produto.vSeg;
-                    VLDesconto += oNfe.Det.Produto.vDesc;
-                    VLIPI += oNfe.Det.Ipost.Ipi.IPITrib.vIPI;
-                    VLPIS += oNfe.Det.Ipost.Pis.vPis;
-                    VLCOFINS += oNfe.Det.Ipost.Cofins.vCOFINS;
-                    VLII += oNfe.Det.Ipost.II.vII;
+                XML.Append("<det nItem='" + Contator + "'>");
+                XML.Append("<prod>");
+                XML.Append("<cProd>" + oNfe.Det.Produto.cProd + "</cProd>");
+                XML.Append("<cEAN>SEM GTIN</cEAN>");
+                XML.Append("<xProd>" + oNfe.Util.FncRetiraCaracteresCampoTexto((oNfe.Det.Produto.xProd.Length > 59 ? oNfe.Det.Produto.xProd.Substring(0, 59) : oNfe.Det.Produto.xProd)).TrimStart().TrimEnd() + "</xProd>");
+                if (!(oNfe.Det.Produto.NCM == string.Empty))
+                {
+                    XML.Append("<NCM>" + oNfe.Det.Produto.NCM + "</NCM>");
+                }
 
-                    oNfe.IcmsTot.vNF = (VLProduto + VLFrete + OutrasDespesas + VLSeguro + VLIPI + vICMSST) - VLDesconto;
+                //// Alterado por: Bruno Arrais Cavalcante data: 13/06/2018
+                ////O campo CEST e os opcionais indEscala e CNPJFab foram movidos para um grupo próprio na NFe 4.0
+                XML.Append("<CEST>" + oNfe.Det.Produto.CEST + "</CEST>");
+                //XML.Append("< indEscala > S </ indEscala >");
+                //XML.Append("< CNPJFab > CNPJFab1 </ CNPJFab >");
 
-                    OutrasDespesas += Dr["OutrasDespesas"] is DBNull ? 0 : decimal.Parse(Dr["OutrasDespesas"].ToString());
+                XML.Append("<CFOP>" + oNfe.Det.Produto.CFOP.Replace(",", "") + "</CFOP>");
+                XML.Append("<uCom>" + oNfe.Util.FUNC_CARACTER_ESPECIAL(oNfe.Det.Produto.uCom.Replace(",", "")) + "</uCom>");
+                XML.Append("<qCom>" + string.Format("{0:0.000}", decimal.Parse(oNfe.Det.Produto.qCom.ToString())).Replace(",", ".") + "</qCom>");
+                XML.Append("<vUnCom>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Produto.vUnCom.ToString())).Replace(",", ".") + "</vUnCom>");
+                XML.Append("<vProd>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Produto.vProd.ToString())).Replace(",", ".") + "</vProd>");
+                XML.Append("<cEANTrib>SEM GTIN</cEANTrib>");
+                XML.Append("<uTrib>" + oNfe.Util.FUNC_CARACTER_ESPECIAL(oNfe.Det.Produto.uTrib) + "</uTrib>");
+                XML.Append("<qTrib>" + string.Format("{0:0.000}", decimal.Parse(oNfe.Det.Produto.qTrib.ToString())).Replace(",", ".") + "</qTrib>");
+                XML.Append("<vUnTrib>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Produto.vUnTrib.ToString())).Replace(",", ".") + "</vUnTrib>");
 
-                    if (oNfe.Det.Produto.cProd == string.Empty || oNfe.Det.Produto.cProd == "0")
-                    {
-                        parametros = new string[] { "null", oNfe.Ide.cNF.ToString(), oNfe.infNfe.Substring(3, oNfe.infNfe.Length - 3), "4", "Não existe produtos associados a esse número de nota" };
-                    }
+                if (oNfe.Det.Produto.vDesc > 0)
+                {
+                    XML.Append("<vDesc>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Produto.vDesc.ToString())).Replace(",", ".") + "</vDesc>");
+                }
 
-                    XML.Append("<det nItem='" + Contator + "'>");
-                    XML.Append("<prod>");
-                    XML.Append("<cProd>" + oNfe.Det.Produto.cProd + "</cProd>");
-                    XML.Append("<cEAN>SEM GTIN</cEAN>");
-                    XML.Append("<xProd>" + oNfe.Util.FncRetiraCaracteresCampoTexto((oNfe.Det.Produto.xProd.Length > 59 ? oNfe.Det.Produto.xProd.Substring(0, 59) : oNfe.Det.Produto.xProd)).TrimStart().TrimEnd() + "</xProd>");
-                    if (!(oNfe.Det.Produto.NCM == string.Empty))
-                    {
-                        XML.Append("<NCM>" + oNfe.Det.Produto.NCM + "</NCM>");
-                    }
+                if (oNfe.Det.Produto.vFrete > 0)
+                {
+                    XML.Append("<vFrete>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Produto.vFrete.ToString())).Replace(",", ".") + "</vFrete>");
+                }
 
-                    //// Alterado por: Bruno Arrais Cavalcante data: 13/06/2018
-                    ////O campo CEST e os opcionais indEscala e CNPJFab foram movidos para um grupo próprio na NFe 4.0
-                    XML.Append("<CEST>" + oNfe.Det.Produto.CEST + "</CEST>");
-                    //XML.Append("< indEscala > S </ indEscala >");
-                    //XML.Append("< CNPJFab > CNPJFab1 </ CNPJFab >");
+                if (oNfe.Det.Produto.vOutras > 0)
+                {
+                    XML.Append("<vOutro>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Produto.vOutras.ToString())).Replace(",", ".") + "</vOutro>");
+                }
+                XML.Append("<indTot>" + oNfe.Det.Produto.indTot + "</indTot>");
 
-                    XML.Append("<CFOP>" + oNfe.Det.Produto.CFOP.Replace(",", "") + "</CFOP>");
-                    XML.Append("<uCom>" + oNfe.Util.FUNC_CARACTER_ESPECIAL(oNfe.Det.Produto.uCom.Replace(",", "")) + "</uCom>");
-                    XML.Append("<qCom>" + string.Format("{0:0.000}", decimal.Parse(oNfe.Det.Produto.qCom.ToString())).Replace(",", ".") + "</qCom>");
-                    XML.Append("<vUnCom>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Produto.vUnCom.ToString())).Replace(",", ".") + "</vUnCom>");
-                    XML.Append("<vProd>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Produto.vProd.ToString())).Replace(",", ".") + "</vProd>");
-                    XML.Append("<cEANTrib>SEM GTIN</cEANTrib>");
-                    XML.Append("<uTrib>" + oNfe.Util.FUNC_CARACTER_ESPECIAL(oNfe.Det.Produto.uTrib) + "</uTrib>");
-                    XML.Append("<qTrib>" + string.Format("{0:0.000}", decimal.Parse(oNfe.Det.Produto.qTrib.ToString())).Replace(",", ".") + "</qTrib>");
-                    XML.Append("<vUnTrib>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Produto.vUnTrib.ToString())).Replace(",", ".") + "</vUnTrib>");
+                ////IMPORTAÇÃO!!
+                //if (oNfe.Det.Produto.CFOP.Replace(",", "").Substring(0, 1).ToString() == "3")
+                //{
 
-                    if (oNfe.Det.Produto.vDesc > 0)
-                    {
-                        XML.Append("<vDesc>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Produto.vDesc.ToString())).Replace(",", ".") + "</vDesc>");
-                    }
+                //    XML.Append("<DI>");
+                //    XML.Append("<nDI>" + oNfe.NumDocDI.ToString() + "</nDI>");
+                //    XML.Append("<dDI>" + oNfe.DataRegistroDI.ToString() + "</dDI>");
+                //    XML.Append("<xLocDesemb>" + oNfe.LocalDesembDI.ToString() + "</xLocDesemb>");
+                //    XML.Append("<UFDesemb>" + oNfe.UFDesembDI.ToString() + "</UFDesemb>");
+                //    XML.Append("<dDesemb>" + oNfe.DataRegistroDI.ToString() + "</dDesemb>");
 
-                    if (oNfe.Det.Produto.vFrete > 0)
-                    {
-                        XML.Append("<vFrete>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Produto.vFrete.ToString())).Replace(",", ".") + "</vFrete>");
-                    }
+                //    string cExportador = oNfe.IDCliente.ToString();
 
-                    if (oNfe.Det.Produto.vOutras > 0)
-                    {
-                        XML.Append("<vOutro>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Produto.vOutras.ToString())).Replace(",", ".") + "</vOutro>");
-                    }
-                    XML.Append("<indTot>" + oNfe.Det.Produto.indTot + "</indTot>");
+                //    XML.Append("<cExportador>" + cExportador + "</cExportador>"); // <-- IDCLIENTE / IDFORNECEDOR
 
-                    ////IMPORTAÇÃO!!
-                    //if (oNfe.Det.Produto.CFOP.Replace(",", "").Substring(0, 1).ToString() == "3")
-                    //{
+                //    XML.Append("<adi>");
+                //    XML.Append("<nAdicao>" + Contator.ToString() + "</nAdicao>");
+                //    XML.Append("<nSeqAdic>" + Contator.ToString() + "</nSeqAdic>");
+                //    XML.Append("<cFabricante>" + oNfe.IDFabEstrangeiro.ToString() + "</cFabricante>"); // <-- IDFabEstrangeiro
+                //    XML.Append("</adi>");
+                //    XML.Append("</DI>");
+                //}
 
-                    //    XML.Append("<DI>");
-                    //    XML.Append("<nDI>" + oNfe.NumDocDI.ToString() + "</nDI>");
-                    //    XML.Append("<dDI>" + oNfe.DataRegistroDI.ToString() + "</dDI>");
-                    //    XML.Append("<xLocDesemb>" + oNfe.LocalDesembDI.ToString() + "</xLocDesemb>");
-                    //    XML.Append("<UFDesemb>" + oNfe.UFDesembDI.ToString() + "</UFDesemb>");
-                    //    XML.Append("<dDesemb>" + oNfe.DataRegistroDI.ToString() + "</dDesemb>");
+                //NÚMERO DO PEDIDO DE COMPRA - ADICIONADO 29/11/2011!!
+                //if (!string.IsNullOrEmpty(oNfe.Det.Produto.xPed))
+                //    XML.Append("<xPed>" + oNfe.Det.Produto.xPed + "</xPed>");
 
-                    //    string cExportador = oNfe.IDCliente.ToString();
+                XML.Append("</prod>");
 
-                    //    XML.Append("<cExportador>" + cExportador + "</cExportador>"); // <-- IDCLIENTE / IDFORNECEDOR
+                XML.Append("<imposto>");
+                XML.Append("<ICMS>");
 
-                    //    XML.Append("<adi>");
-                    //    XML.Append("<nAdicao>" + Contator.ToString() + "</nAdicao>");
-                    //    XML.Append("<nSeqAdic>" + Contator.ToString() + "</nSeqAdic>");
-                    //    XML.Append("<cFabricante>" + oNfe.IDFabEstrangeiro.ToString() + "</cFabricante>"); // <-- IDFabEstrangeiro
-                    //    XML.Append("</adi>");
-                    //    XML.Append("</DI>");
-                    //}
+                if (oNfe.Det.Produto.SitTributB == "20")
+                {
+                    XML.Append("<ICMS20>");
+                    XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs20.orig + "</orig>");
+                    XML.Append("<CST>20</CST>");
+                    XML.Append("<modBC>" + oNfe.Det.Ipost.Icms.ICMs20.modBC + "</modBC>");
+                    XML.Append("<pRedBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs20.pRedBC.ToString())).Replace(",", ".") + "</pRedBC>");
+                    XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs20.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                    XML.Append("<pICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs20.pICMS.ToString())).Replace(",", ".") + "</pICMS>");
+                    XML.Append("<vICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs20.vICMS.ToString())).Replace(",", ".") + "</vICMS>");
+                    XML.Append("</ICMS20>");
+                }
+                else if (oNfe.Det.Produto.SitTributB == "10")
+                {
+                    XML.Append("<ICMS10>");
+                    XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs10.orig + "</orig>");
+                    XML.Append("<CST>10</CST>");
+                    XML.Append("<modBC>" + oNfe.Det.Ipost.Icms.ICMs10.modBC + "</modBC>");
+                    XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                    XML.Append("<pICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.pICMS.ToString())).Replace(",", ".") + "</pICMS>");
+                    XML.Append("<vICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.vICMS.ToString())).Replace(",", ".") + "</vICMS>");
+                    XML.Append("<modBCST>" + oNfe.Det.Ipost.Icms.ICMs10.modBCST + "</modBCST>");
+                    XML.Append("<vBCST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.vBCST.ToString())).Replace(",", ".") + "</vBCST>");
+                    XML.Append("<pICMSST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.pICMSST.ToString())).Replace(",", ".") + "</pICMSST>");
+                    XML.Append("<vICMSST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.vICMSST.ToString())).Replace(",", ".") + "</vICMSST>");
+                    XML.Append("</ICMS10>");
+                }
 
-                    //NÚMERO DO PEDIDO DE COMPRA - ADICIONADO 29/11/2011!!
-                    //if (!string.IsNullOrEmpty(oNfe.Det.Produto.xPed))
-                    //    XML.Append("<xPed>" + oNfe.Det.Produto.xPed + "</xPed>");
+                //******************************************
+                //TODOS ABAIXO PERTENCEM AO GRUPO ICMS40!!
+                else if (oNfe.Det.Produto.SitTributB == "40")
+                {
+                    XML.Append("<ICMS40>");
+                    XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs40.orig + "</orig>");
+                    XML.Append("<CST>40</CST>");
+                    XML.Append("</ICMS40>");
+                }
+                else if (oNfe.Det.Produto.SitTributB == "41")
+                {
+                    XML.Append("<ICMS40>");
+                    XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs40.orig + "</orig>");
+                    XML.Append("<CST>41</CST>");
+                    XML.Append("</ICMS40>");
+                }
+                else if (oNfe.Det.Produto.SitTributB == "50")
+                {
+                    XML.Append("<ICMS40>");
+                    XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs40.orig + "</orig>");
+                    XML.Append("<CST>50</CST>");
+                    XML.Append("</ICMS40>");
+                }
+                //END TODOS ACIMA PERTENCEM AO GRUPO ICMS40!!
+                //*********************************************
 
-                    XML.Append("</prod>");
-
-                    XML.Append("<imposto>");
-                    XML.Append("<ICMS>");
-
-                    if (oNfe.Det.Produto.SitTributB == "20")
-                    {
-                        XML.Append("<ICMS20>");
-                        XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs20.orig + "</orig>");
-                        XML.Append("<CST>20</CST>");
-                        XML.Append("<modBC>" + oNfe.Det.Ipost.Icms.ICMs20.modBC + "</modBC>");
-                        XML.Append("<pRedBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs20.pRedBC.ToString())).Replace(",", ".") + "</pRedBC>");
-                        XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs20.vBC.ToString())).Replace(",", ".") + "</vBC>");
-                        XML.Append("<pICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs20.pICMS.ToString())).Replace(",", ".") + "</pICMS>");
-                        XML.Append("<vICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs20.vICMS.ToString())).Replace(",", ".") + "</vICMS>");
-                        XML.Append("</ICMS20>");
-                    }
-                    else if (oNfe.Det.Produto.SitTributB == "10")
-                    {
-                        XML.Append("<ICMS10>");
-                        XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs10.orig + "</orig>");
-                        XML.Append("<CST>10</CST>");
-                        XML.Append("<modBC>" + oNfe.Det.Ipost.Icms.ICMs10.modBC + "</modBC>");
-                        XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.vBC.ToString())).Replace(",", ".") + "</vBC>");
-                        XML.Append("<pICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.pICMS.ToString())).Replace(",", ".") + "</pICMS>");
-                        XML.Append("<vICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.vICMS.ToString())).Replace(",", ".") + "</vICMS>");
-                        XML.Append("<modBCST>" + oNfe.Det.Ipost.Icms.ICMs10.modBCST + "</modBCST>");
-                        XML.Append("<vBCST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.vBCST.ToString())).Replace(",", ".") + "</vBCST>");
-                        XML.Append("<pICMSST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.pICMSST.ToString())).Replace(",", ".") + "</pICMSST>");
-                        XML.Append("<vICMSST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs10.vICMSST.ToString())).Replace(",", ".") + "</vICMSST>");
-                        XML.Append("</ICMS10>");
-                    }
-
-                    //******************************************
-                    //TODOS ABAIXO PERTENCEM AO GRUPO ICMS40!!
-                    else if (oNfe.Det.Produto.SitTributB == "40")
-                    {
-                        XML.Append("<ICMS40>");
-                        XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs40.orig + "</orig>");
-                        XML.Append("<CST>40</CST>");
-                        XML.Append("</ICMS40>");
-                    }
-                    else if (oNfe.Det.Produto.SitTributB == "41")
-                    {
-                        XML.Append("<ICMS40>");
-                        XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs40.orig + "</orig>");
-                        XML.Append("<CST>41</CST>");
-                        XML.Append("</ICMS40>");
-                    }
-                    else if (oNfe.Det.Produto.SitTributB == "50")
-                    {
-                        XML.Append("<ICMS40>");
-                        XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs40.orig + "</orig>");
-                        XML.Append("<CST>50</CST>");
-                        XML.Append("</ICMS40>");
-                    }
-                    //END TODOS ACIMA PERTENCEM AO GRUPO ICMS40!!
-                    //*********************************************
-
-                    else if (oNfe.Det.Produto.SitTributB == "51")
-                    {
-                        XML.Append("<ICMS51>");
-                        XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs51.orig + "</orig>");
-                        XML.Append("<CST>51</CST>");
-                        XML.Append("<modBC>" + oNfe.Det.Ipost.Icms.ICMs51.modBC + "</modBC>");
-                        XML.Append("<pRedBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs51.pRedBC.ToString())).Replace(",", ".") + "</pRedBC>");
-                        XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs51.vBC.ToString())).Replace(",", ".") + "</vBC>");
-                        XML.Append("<pICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs51.pICMS.ToString())).Replace(",", ".") + "</pICMS>");
-                        XML.Append("<vICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs51.vICMS.ToString())).Replace(",", ".") + "</vICMS>");
-                        XML.Append("</ICMS51>");
-                    }
-                    else if (oNfe.Det.Produto.SitTributB == "60")
-                    {
-                        XML.Append("<ICMS60>");
-                        XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs60.orig.ToString() + "</orig>");
-                        XML.Append("<CST>60</CST>");
-                        XML.Append("</ICMS60>");
-                    }
+                else if (oNfe.Det.Produto.SitTributB == "51")
+                {
+                    XML.Append("<ICMS51>");
+                    XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs51.orig + "</orig>");
+                    XML.Append("<CST>51</CST>");
+                    XML.Append("<modBC>" + oNfe.Det.Ipost.Icms.ICMs51.modBC + "</modBC>");
+                    XML.Append("<pRedBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs51.pRedBC.ToString())).Replace(",", ".") + "</pRedBC>");
+                    XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs51.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                    XML.Append("<pICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs51.pICMS.ToString())).Replace(",", ".") + "</pICMS>");
+                    XML.Append("<vICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs51.vICMS.ToString())).Replace(",", ".") + "</vICMS>");
+                    XML.Append("</ICMS51>");
+                }
+                else if (oNfe.Det.Produto.SitTributB == "60")
+                {
+                    XML.Append("<ICMS60>");
+                    XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs60.orig.ToString() + "</orig>");
+                    XML.Append("<CST>60</CST>");
+                    XML.Append("</ICMS60>");
+                }
                 else if (oNfe.Det.Produto.SitTributB == "90")
                 {
                     XML.Append("<ICMS90>");
@@ -960,180 +981,216 @@ namespace NFE.Classes.NFE
                     XML.Append("<pICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs90.pICMS.ToString())).Replace(",", ".") + "</pICMS>");
                     XML.Append("<vICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs90.vICMS.ToString())).Replace(",", ".") + "</vICMS>");
                     //Essa Situação Tributária pode ter ou não a incidência de ST. Dessa forma, caso o campo modBCST tenha sido preenchido, preenche as informações no XML
-                    if(oNfe.Det.Ipost.Icms.ICMs90.modBCST != "")
-                    { 
-                    XML.Append("<modBCST>" + oNfe.Det.Ipost.Icms.ICMs90.modBCST + "</modBCST>");
-                    XML.Append("<vBCST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs90.vBCST.ToString())).Replace(",", ".") + "</vBCST>");
-                    XML.Append("<pICMSST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs90.pICMSST.ToString())).Replace(",", ".") + "</pICMSST>");
-                    XML.Append("<vICMSST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs90.vICMSST.ToString())).Replace(",", ".") + "</vICMSST>");
+                    if (oNfe.Det.Ipost.Icms.ICMs90.modBCST != "")
+                    {
+                        XML.Append("<modBCST>" + oNfe.Det.Ipost.Icms.ICMs90.modBCST + "</modBCST>");
+                        XML.Append("<vBCST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs90.vBCST.ToString())).Replace(",", ".") + "</vBCST>");
+                        XML.Append("<pICMSST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs90.pICMSST.ToString())).Replace(",", ".") + "</pICMSST>");
+                        XML.Append("<vICMSST>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs90.vICMSST.ToString())).Replace(",", ".") + "</vICMSST>");
                     }
                     XML.Append("</ICMS90>");
                 }
                 else
+                {
+                    XML.Append("<ICMS00>");
+                    XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs00.orig + "</orig>");
+                    XML.Append("<CST>00</CST>");
+                    XML.Append("<modBC>" + oNfe.Det.Ipost.Icms.ICMs00.modBC + "</modBC>");
+                    XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs00.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                    XML.Append("<pICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs00.pICMS.ToString())).Replace(",", ".") + "</pICMS>");
+                    XML.Append("<vICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs00.vICMS.ToString())).Replace(",", ".") + "</vICMS>");
+                    XML.Append("</ICMS00>");
+                }
+
+                XML.Append("</ICMS>");
+
+                // A TAG IPI SÓ A PARECE QUANDO FOI INFORMADO ALGUM VALOR DESTE IMPOSTO
+                if (oNfe.Det.Ipost.Ipi.IPITrib.vIPI > 0)
+                {
+                    XML.Append("<IPI>");
+                    if (oNfe.Dest.EnderDest.UFCli == "EX")
                     {
-                        XML.Append("<ICMS00>");
-                        XML.Append("<orig>" + oNfe.Det.Ipost.Icms.ICMs00.orig + "</orig>");
-                        XML.Append("<CST>00</CST>");
-                        XML.Append("<modBC>" + oNfe.Det.Ipost.Icms.ICMs00.modBC + "</modBC>");
-                        XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs00.vBC.ToString())).Replace(",", ".") + "</vBC>");
-                        XML.Append("<pICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs00.pICMS.ToString())).Replace(",", ".") + "</pICMS>");
-                        XML.Append("<vICMS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Icms.ICMs00.vICMS.ToString())).Replace(",", ".") + "</vICMS>");
-                        XML.Append("</ICMS00>");
+                        XML.Append("<clEnq>999</clEnq>");
                     }
 
-                    XML.Append("</ICMS>");
+                    XML.Append("<cEnq>" + oNfe.Det.Ipost.Ipi.cEnq + "</cEnq>");
 
-                    // A TAG IPI SÓ A PARECE QUANDO FOI INFORMADO ALGUM VALOR DESTE IMPOSTO
-                    if (oNfe.Det.Ipost.Ipi.IPITrib.vIPI > 0)
+                    if (
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "01" ||
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "02" ||
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "03" ||
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "04" ||
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "05" ||
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "20" ||
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "51" ||
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "52" ||
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "53" ||
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "54" ||
+                        oNfe.Det.Ipost.Ipi.IPITrib.CST == "55"
+                        )
                     {
-                        XML.Append("<IPI>");
-                        if (oNfe.Dest.EnderDest.UFCli == "EX")
-                        {
-                            XML.Append("<clEnq>999</clEnq>");
-                        }
-
-                        XML.Append("<cEnq>" + oNfe.Det.Ipost.Ipi.cEnq + "</cEnq>");
-
-                        if (
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "01" ||
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "02" ||
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "03" ||
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "04" ||
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "05" ||
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "20" ||
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "51" ||
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "52" ||
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "53" ||
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "54" ||
-                            oNfe.Det.Ipost.Ipi.IPITrib.CST == "55"
-                            )
-                        {
-                            XML.Append("<IPINT>");
-                            XML.Append("<CST>" + oNfe.Det.Ipost.Ipi.IPITrib.CST + "</CST>");
-                            XML.Append("</IPINT>");
-                        }
-                        else
-                        {
-                            XML.Append("<IPITrib>");
-                            XML.Append("<CST>" + oNfe.Det.Ipost.Ipi.IPITrib.CST + "</CST>");
-                            XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Ipi.IPITrib.vBC.ToString())).Replace(",", ".") + "</vBC>");
-                            XML.Append("<pIPI>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Ipi.IPITrib.pIPI.ToString())).Replace(",", ".") + "</pIPI>");
-                            XML.Append("<vIPI>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Ipi.IPITrib.vIPI.ToString())).Replace(",", ".") + "</vIPI>");
-                            XML.Append("</IPITrib>");
-                        }
-                        XML.Append("</IPI>");
+                        XML.Append("<IPINT>");
+                        XML.Append("<CST>" + oNfe.Det.Ipost.Ipi.IPITrib.CST + "</CST>");
+                        XML.Append("</IPINT>");
                     }
-
-                    // II - TAG de grupo do Imposto de Importação
-                    //if (oNfe.Dest.EnderDest.UFCli == "EX")
-                    //{
-                    //    XML.Append("<II>");
-                    //    XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.II.vBC.ToString())).Replace(",", ".") + "</vBC>");
-                    //    XML.Append("<vDespAdu>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.II.vDespAdu.ToString())).Replace(",", ".") + "</vDespAdu>");
-                    //    XML.Append("<vII>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.II.vII.ToString())).Replace(",", ".") + "</vII>");
-                    //    XML.Append("<vIOF>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.II.vIOF.ToString())).Replace(",", ".") + "</vIOF>");
-                    //    XML.Append("</II>");
-                    //}
-
-                    // PIS
-                    XML.Append("<PIS>");
-                    // CST - Código Situação Tributaria
-                    // 01 - Operação Tributável - Base de Cálculo = Valor da Operação Alíquota Normal (Cumulativo / Não Cumulativo)
-                    // 02 - Operação Tributável - Base de Cálculo = Valor da Operação (Alíquota Diferenciada)
-                    if ((oNfe.Det.Ipost.Pis.CST == "01") || (oNfe.Det.Ipost.Pis.CST == "02"))
+                    else
                     {
-                        XML.Append("<PISAliq>");
-                        XML.Append("<CST>" + oNfe.Det.Ipost.Pis.CST + "</CST>");
-                        XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.vBC.ToString())).Replace(",", ".") + "</vBC>");
-                        XML.Append("<pPIS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.pPIS.ToString())).Replace(",", ".") + "</pPIS>");
-                        XML.Append("<vPIS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.vPis.ToString())).Replace(",", ".") + "</vPIS>");
-                        XML.Append("</PISAliq>");
+                        XML.Append("<IPITrib>");
+                        XML.Append("<CST>" + oNfe.Det.Ipost.Ipi.IPITrib.CST + "</CST>");
+                        XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Ipi.IPITrib.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                        XML.Append("<pIPI>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Ipi.IPITrib.pIPI.ToString())).Replace(",", ".") + "</pIPI>");
+                        XML.Append("<vIPI>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Ipi.IPITrib.vIPI.ToString())).Replace(",", ".") + "</vIPI>");
+                        XML.Append("</IPITrib>");
                     }
+                    XML.Append("</IPI>");
+                }
 
-                    // 03 - Operação Tributável - Base de Cálculo = Quantidade Vendida x Alíquota por Unidade de Produto
-                    if (oNfe.Det.Ipost.Pis.CST == "03")
+                // II - TAG de grupo do Imposto de Importação
+                //if (oNfe.Dest.EnderDest.UFCli == "EX")
+                //{
+                //    XML.Append("<II>");
+                //    XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.II.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                //    XML.Append("<vDespAdu>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.II.vDespAdu.ToString())).Replace(",", ".") + "</vDespAdu>");
+                //    XML.Append("<vII>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.II.vII.ToString())).Replace(",", ".") + "</vII>");
+                //    XML.Append("<vIOF>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.II.vIOF.ToString())).Replace(",", ".") + "</vIOF>");
+                //    XML.Append("</II>");
+                //}
+
+                // PIS
+                XML.Append("<PIS>");
+                // CST - Código Situação Tributaria
+                // 01 - Operação Tributável - Base de Cálculo = Valor da Operação Alíquota Normal (Cumulativo / Não Cumulativo)
+                // 02 - Operação Tributável - Base de Cálculo = Valor da Operação (Alíquota Diferenciada)
+                if ((oNfe.Det.Ipost.Pis.CST == "01") || (oNfe.Det.Ipost.Pis.CST == "02"))
+                {
+                    XML.Append("<PISAliq>");
+                    XML.Append("<CST>" + oNfe.Det.Ipost.Pis.CST + "</CST>");
+                    XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                    XML.Append("<pPIS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.pPIS.ToString())).Replace(",", ".") + "</pPIS>");
+                    XML.Append("<vPIS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.vPis.ToString())).Replace(",", ".") + "</vPIS>");
+                    XML.Append("</PISAliq>");
+                }
+
+                // 03 - Operação Tributável - Base de Cálculo = Quantidade Vendida x Alíquota por Unidade de Produto
+                if (oNfe.Det.Ipost.Pis.CST == "03")
+                {
+                    XML.Append("<PISQtde>");
+                    XML.Append("<CST>" + oNfe.Det.Ipost.Pis.CST + "</CST>");
+                    XML.Append("<qBCProd>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Ipost.Pis.qBCProd.ToString())).Replace(",", ".") + "</qBCProd>");
+                    XML.Append("<vAliqProd>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Ipost.Pis.vAliqProd.ToString())).Replace(",", ".") + "</vAliqProd>");
+                    XML.Append("<vPIS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.vPis.ToString())).Replace(",", ".") + "</vPIS>");
+                    XML.Append("</PISQtde>");
+                }
+
+                // 04 - Operação Tributável - Tributação Monofásica - (Alíquota Zero)
+                // 06 - Operação Tributável - Alíquota Zero
+                // 07 - Operação Isenta da Contribuição
+                // 08 - Operação sem incidência da Contribuição
+                // 09 - Operação com Suspensão da Contribuição
+                if ((oNfe.Det.Ipost.Pis.CST == "04") || (oNfe.Det.Ipost.Pis.CST == "06") || (oNfe.Det.Ipost.Pis.CST == "07") || (oNfe.Det.Ipost.Pis.CST == "08") || (oNfe.Det.Ipost.Pis.CST == "09"))
+                {
+                    XML.Append("<PISNT>");
+                    XML.Append("<CST>" + oNfe.Det.Ipost.Pis.CST + "</CST>");
+                    XML.Append("</PISNT>");
+                }
+
+                // 99 - Outras Operações
+                if ((oNfe.Det.Ipost.Pis.CST == "99") || (oNfe.Det.Ipost.Pis.CST == "49"))
+                {
+                    XML.Append("<PISOutr>");
+                    XML.Append("<CST>" + oNfe.Det.Ipost.Pis.CST + "</CST>");
+                    XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                    XML.Append("<pPIS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.pPIS.ToString())).Replace(",", ".") + "</pPIS>");
+                    XML.Append("<vPIS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.vPis.ToString())).Replace(",", ".") + "</vPIS>");
+                    XML.Append("</PISOutr>");
+                }
+                XML.Append("</PIS>");
+
+                XML.Append("<COFINS>");
+                // CST - Código Situação Tributaria
+                // 01 - Operação Tributável - Base de Cálculo = Valor da Operação Alíquota Normal (Cumulativo / Não Cumulativo)
+                // 02 - Operação Tributável - Base de Cálculo = Valor da Operação (Alíquota Diferenciada)
+                if ((oNfe.Det.Ipost.Cofins.CST == "01") || (oNfe.Det.Ipost.Cofins.CST == "02"))
+                {
+                    XML.Append("<COFINSAliq>");
+                    XML.Append("<CST>" + oNfe.Det.Ipost.Cofins.CST + "</CST>");
+                    XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                    XML.Append("<pCOFINS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.pCOFINS.ToString())).Replace(",", ".") + "</pCOFINS>");
+                    XML.Append("<vCOFINS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.vCOFINS.ToString())).Replace(",", ".") + "</vCOFINS>");
+                    XML.Append("</COFINSAliq>");
+                }
+
+                // 03 - Operação Tributável - Base de Cálculo = Quantidade Vendida x Alíquota por Unidade de Produto
+                if (oNfe.Det.Ipost.Cofins.CST == "03")
+                {
+                    XML.Append("<COFINSQtde>");
+                    XML.Append("<CST>" + oNfe.Det.Ipost.Cofins.CST + "</CST>");
+                    XML.Append("<qBCProd>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Ipost.Cofins.qBCProd.ToString())).Replace(",", ".") + "</qBCProd>");
+                    XML.Append("<vAliqProd>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Ipost.Cofins.vAliqProd.ToString())).Replace(",", ".") + "</vAliqProd>");
+                    XML.Append("<vCOFINS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.vCOFINS.ToString())).Replace(",", ".") + "</vCOFINS>");
+                    XML.Append("</COFINSQtde>");
+                }
+
+                // 04 - Operação Tributável - Tributação Monofásica - (Alíquota Zero)
+                // 06 - Operação Tributável - Alíquota Zero
+                // 07 - Operação Isenta da Contribuição
+                // 08 - Operação sem incidência da Contribuição
+                // 09 - Operação com Suspensão da Contribuição
+                if ((oNfe.Det.Ipost.Cofins.CST == "04") || (oNfe.Det.Ipost.Cofins.CST == "06") || (oNfe.Det.Ipost.Cofins.CST == "07") || (oNfe.Det.Ipost.Cofins.CST == "08") || (oNfe.Det.Ipost.Cofins.CST == "09"))
+                {
+                    XML.Append("<COFINSNT>");
+                    XML.Append("<CST>" + oNfe.Det.Ipost.Cofins.CST + "</CST>");
+                    XML.Append("</COFINSNT>");
+                }
+
+                // 99 - Outras Operações
+                if ((oNfe.Det.Ipost.Cofins.CST == "99") || (oNfe.Det.Ipost.Cofins.CST == "49"))
+                {
+                    XML.Append("<COFINSOutr>");
+                    XML.Append("<CST>" + oNfe.Det.Ipost.Cofins.CST + "</CST>");
+                    XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                    XML.Append("<pCOFINS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.pCOFINS.ToString())).Replace(",", ".") + "</pCOFINS>");
+                    XML.Append("<vCOFINS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.vCOFINS.ToString())).Replace(",", ".") + "</vCOFINS>");
+                    XML.Append("</COFINSOutr>");
+                }
+                XML.Append("</COFINS>");
+
+                //Grupo UB - Informações dos tributos IBS / CBS e Imposto Seletivo
+                string cstIBS = (oNfe.Det.Ipost.IBSCBS.CST ?? string.Empty).Trim();
+                string cClassTrib = (oNfe.Det.Ipost.IBSCBS.cClassTrib ?? string.Empty).Trim();
+
+                if (!string.IsNullOrEmpty(cstIBS) && !string.IsNullOrEmpty(cClassTrib))
+                {
+                    XML.Append("<IBSCBS>");
+                    XML.Append("<CST>" + oNfe.Det.Ipost.IBSCBS.CST + "</CST>");
+                    XML.Append("<cClassTrib>" + oNfe.Det.Ipost.IBSCBS.cClassTrib + "</cClassTrib>");
+
+                    if (!cstIBS.StartsWith("4"))
                     {
-                        XML.Append("<PISQtde>");
-                        XML.Append("<CST>" + oNfe.Det.Ipost.Pis.CST + "</CST>");
-                        XML.Append("<qBCProd>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Ipost.Pis.qBCProd.ToString())).Replace(",", ".") + "</qBCProd>");
-                        XML.Append("<vAliqProd>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Ipost.Pis.vAliqProd.ToString())).Replace(",", ".") + "</vAliqProd>");
-                        XML.Append("<vPIS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.vPis.ToString())).Replace(",", ".") + "</vPIS>");
-                        XML.Append("</PISQtde>");
+                        XML.Append("<gIBSCBS>");
+                        XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.IBSCBS.vBC.ToString())).Replace(",", ".") + "</vBC>");
+                        XML.Append("<gIBSUF>");
+                        XML.Append("<pIBSUF>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.IBSCBS.pIBSUF.ToString())).Replace(",", ".") + "</pIBSUF>");
+                        XML.Append("<vIBSUF>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.IBSCBS.vIBSUF.ToString())).Replace(",", ".") + "</vIBSUF>");
+                        XML.Append("</gIBSUF>");
+                        XML.Append("<gIBSMun>");
+                        XML.Append("<pIBSMun>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.IBSCBS.pIBSMun.ToString())).Replace(",", ".") + "</pIBSMun>");
+                        XML.Append("<vIBSMun>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.IBSCBS.vIBSMun.ToString())).Replace(",", ".") + "</vIBSMun>");
+                        XML.Append("</gIBSMun>");
+                        XML.Append("<vIBS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.IBSCBS.vIBS.ToString())).Replace(",", ".") + "</vIBS>");
+                        XML.Append("<gCBS>");
+                        XML.Append("<pCBS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.IBSCBS.pCBS.ToString())).Replace(",", ".") + "</pCBS>");
+                        XML.Append("<vCBS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.IBSCBS.vCBS.ToString())).Replace(",", ".") + "</vCBS>");
+                        XML.Append("</gCBS>");
+                        XML.Append("</gIBSCBS>");
                     }
+                    XML.Append("</IBSCBS>");
 
-                    // 04 - Operação Tributável - Tributação Monofásica - (Alíquota Zero)
-                    // 06 - Operação Tributável - Alíquota Zero
-                    // 07 - Operação Isenta da Contribuição
-                    // 08 - Operação sem incidência da Contribuição
-                    // 09 - Operação com Suspensão da Contribuição
-                    if ((oNfe.Det.Ipost.Pis.CST == "04") || (oNfe.Det.Ipost.Pis.CST == "06") || (oNfe.Det.Ipost.Pis.CST == "07") || (oNfe.Det.Ipost.Pis.CST == "08") || (oNfe.Det.Ipost.Pis.CST == "09"))
-                    {
-                        XML.Append("<PISNT>");
-                        XML.Append("<CST>" + oNfe.Det.Ipost.Pis.CST + "</CST>");
-                        XML.Append("</PISNT>");
-                    }
-
-                    // 99 - Outras Operações
-                    if ((oNfe.Det.Ipost.Pis.CST == "99") || (oNfe.Det.Ipost.Pis.CST == "49"))
-                    {
-                        XML.Append("<PISOutr>");
-                        XML.Append("<CST>" + oNfe.Det.Ipost.Pis.CST + "</CST>");
-                        XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.vBC.ToString())).Replace(",", ".") + "</vBC>");
-                        XML.Append("<pPIS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.pPIS.ToString())).Replace(",", ".") + "</pPIS>");
-                        XML.Append("<vPIS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Pis.vPis.ToString())).Replace(",", ".") + "</vPIS>");
-                        XML.Append("</PISOutr>");
-                    }
-                    XML.Append("</PIS>");
-
-                    XML.Append("<COFINS>");
-                    // CST - Código Situação Tributaria
-                    // 01 - Operação Tributável - Base de Cálculo = Valor da Operação Alíquota Normal (Cumulativo / Não Cumulativo)
-                    // 02 - Operação Tributável - Base de Cálculo = Valor da Operação (Alíquota Diferenciada)
-                    if ((oNfe.Det.Ipost.Cofins.CST == "01") || (oNfe.Det.Ipost.Cofins.CST == "02"))
-                    {
-                        XML.Append("<COFINSAliq>");
-                        XML.Append("<CST>" + oNfe.Det.Ipost.Cofins.CST + "</CST>");
-                        XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.vBC.ToString())).Replace(",", ".") + "</vBC>");
-                        XML.Append("<pCOFINS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.pCOFINS.ToString())).Replace(",", ".") + "</pCOFINS>");
-                        XML.Append("<vCOFINS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.vCOFINS.ToString())).Replace(",", ".") + "</vCOFINS>");
-                        XML.Append("</COFINSAliq>");
-                    }
-
-                    // 03 - Operação Tributável - Base de Cálculo = Quantidade Vendida x Alíquota por Unidade de Produto
-                    if (oNfe.Det.Ipost.Cofins.CST == "03")
-                    {
-                        XML.Append("<COFINSQtde>");
-                        XML.Append("<CST>" + oNfe.Det.Ipost.Cofins.CST + "</CST>");
-                        XML.Append("<qBCProd>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Ipost.Cofins.qBCProd.ToString())).Replace(",", ".") + "</qBCProd>");
-                        XML.Append("<vAliqProd>" + string.Format("{0:0.0000}", decimal.Parse(oNfe.Det.Ipost.Cofins.vAliqProd.ToString())).Replace(",", ".") + "</vAliqProd>");
-                        XML.Append("<vCOFINS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.vCOFINS.ToString())).Replace(",", ".") + "</vCOFINS>");
-                        XML.Append("</COFINSQtde>");
-                    }
-
-                    // 04 - Operação Tributável - Tributação Monofásica - (Alíquota Zero)
-                    // 06 - Operação Tributável - Alíquota Zero
-                    // 07 - Operação Isenta da Contribuição
-                    // 08 - Operação sem incidência da Contribuição
-                    // 09 - Operação com Suspensão da Contribuição
-                    if ((oNfe.Det.Ipost.Cofins.CST == "04") || (oNfe.Det.Ipost.Cofins.CST == "06") || (oNfe.Det.Ipost.Cofins.CST == "07") || (oNfe.Det.Ipost.Cofins.CST == "08") || (oNfe.Det.Ipost.Cofins.CST == "09"))
-                    {
-                        XML.Append("<COFINSNT>");
-                        XML.Append("<CST>" + oNfe.Det.Ipost.Cofins.CST + "</CST>");
-                        XML.Append("</COFINSNT>");
-                    }
-
-                    // 99 - Outras Operações
-                    if ((oNfe.Det.Ipost.Cofins.CST == "99") || (oNfe.Det.Ipost.Cofins.CST == "49"))
-                    {
-                        XML.Append("<COFINSOutr>");
-                        XML.Append("<CST>" + oNfe.Det.Ipost.Cofins.CST + "</CST>");
-                        XML.Append("<vBC>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.vBC.ToString())).Replace(",", ".") + "</vBC>");
-                        XML.Append("<pCOFINS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.pCOFINS.ToString())).Replace(",", ".") + "</pCOFINS>");
-                        XML.Append("<vCOFINS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.Det.Ipost.Cofins.vCOFINS.ToString())).Replace(",", ".") + "</vCOFINS>");
-                        XML.Append("</COFINSOutr>");
-                    }
-                    XML.Append("</COFINS>");
-
+                    VLBCIBSCBS += oNfe.Det.Ipost.IBSCBS.vBC;
+                    VLIBSUF += oNfe.Det.Ipost.IBSCBS.vIBSUF;
+                    VLIBSMun += oNfe.Det.Ipost.IBSCBS.vIBSMun;
+                    VLCBS += oNfe.Det.Ipost.IBSCBS.vCBS;
+                }
                     XML.Append("</imposto>");
                     XML.Append("<infAdProd>FCP 0 BC 0.0 = 0.00</infAdProd>");
                     XML.Append("</det>");
@@ -1158,6 +1215,10 @@ namespace NFE.Classes.NFE
                 oNfe.IcmsTot.vCOFINS = VLCOFINS;
                 oNfe.IcmsTot.vII = VLII;
                 oNfe.IcmsTot.vOutro = OutrasDespesas;
+                oNfe.IcmsTot.vBCIBSCBS = VLBCIBSCBS;
+                oNfe.IcmsTot.vIBSUF = VLIBSUF;
+                oNfe.IcmsTot.vIBSMun = VLIBSMun;
+                oNfe.IcmsTot.vCBS = VLCBS;
 
                 oNfe.IcmsTot.vNF = (VLProduto + VLFrete + OutrasDespesas + VLSeguro + VLIPI + vICMSST) - VLDesconto;
 
@@ -1209,6 +1270,41 @@ namespace NFE.Classes.NFE
                 XML.Append("<vOutro>" + string.Format("{0:0.00}", decimal.Parse(oNfe.IcmsTot.vOutro.ToString())).Replace(",", ".") + "</vOutro>");
                 XML.Append("<vNF>" + string.Format("{0:0.00}", decimal.Parse(oNfe.IcmsTot.vNF.ToString())).Replace(",", ".") + "</vNF>");
                 XML.Append("</ICMSTot>");
+
+                //Totais dos tributos IBS/CBS e Imposto Seletivo
+                if (VLBCIBSCBS > 0)
+                {
+                    oNfe.IcmsTot.vIBS = VLIBSUF + VLIBSMun;
+                    oNfe.IcmsTot.vNFTot = oNfe.IcmsTot.vNF + oNfe.IcmsTot.vIBS + VLCBS;
+
+                    XML.Append("<IBSCBSTot>");
+                    XML.Append("<vBCIBSCBS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.IcmsTot.vBCIBSCBS.ToString())).Replace(",", ".") + "</vBCIBSCBS>");
+                    XML.Append("<gIBS>");
+                    XML.Append("<gIBSUF>");
+                    XML.Append("<vDif>0.00</vDif>");
+                    XML.Append("<vDevTrib>0.00</vDevTrib>");
+                    XML.Append("<vIBSUF>" + string.Format("{0:0.00}", decimal.Parse(oNfe.IcmsTot.vIBSUF.ToString())).Replace(",", ".") + "</vIBSUF>");
+                    XML.Append("</gIBSUF>");
+                    XML.Append("<gIBSMun>");
+                    XML.Append("<vDif>0.00</vDif>");
+                    XML.Append("<vDevTrib>0.00</vDevTrib>");
+                    XML.Append("<vIBSMun>" + string.Format("{0:0.00}", decimal.Parse(oNfe.IcmsTot.vIBSMun.ToString())).Replace(",", ".") + "</vIBSMun>");
+                    XML.Append("</gIBSMun>");
+                    XML.Append("<vIBS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.IcmsTot.vIBS.ToString())).Replace(",", ".") + "</vIBS>");
+                    XML.Append("<vCredPres>0.00</vCredPres>");
+                    XML.Append("<vCredPresCondSus>0.00</vCredPresCondSus>");
+                    XML.Append("</gIBS>");
+                    XML.Append("<gCBS>");
+                    XML.Append("<vDif>0.00</vDif>");
+                    XML.Append("<vDevTrib>0.00</vDevTrib>");
+                    XML.Append("<vCBS>" + string.Format("{0:0.00}", decimal.Parse(oNfe.IcmsTot.vCBS.ToString())).Replace(",", ".") + "</vCBS>");
+                    XML.Append("<vCredPres>0.00</vCredPres>");
+                    XML.Append("<vCredPresCondSus>0.00</vCredPresCondSus>");
+                    XML.Append("</gCBS>");
+                    XML.Append("</IBSCBSTot>");
+                    XML.Append("<vNFTot>" + string.Format("{0:0.00}", decimal.Parse(oNfe.IcmsTot.vNFTot.ToString())).Replace(",", ".") + "</vNFTot>");
+                }
+
                 XML.Append("</total>");
                 #endregion
 

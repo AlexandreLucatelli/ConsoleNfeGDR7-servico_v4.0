@@ -52,5 +52,11 @@ namespace NFE.Classes.NFE.Objetos.Recepcao.Det.Impostos
             set { _Cofins = value; }
         }
 
+        IBSCBS _IBSCBS = new IBSCBS();
+        public IBSCBS IBSCBS
+        {
+            get { return _IBSCBS; }
+            set { _IBSCBS = value; }
+        }
     }
 }
