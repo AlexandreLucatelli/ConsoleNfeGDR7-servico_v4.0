@@ -656,6 +656,7 @@ namespace NFE.Classes.NFE
                         VLIBSUF = 0,
                         VLIBSMun = 0,
                         VLCBS = 0;
+                bool blnIBSCBS = false;
 
             while (Dr.Read())
             {
@@ -1190,6 +1191,7 @@ namespace NFE.Classes.NFE
                     VLIBSUF += oNfe.Det.Ipost.IBSCBS.vIBSUF;
                     VLIBSMun += oNfe.Det.Ipost.IBSCBS.vIBSMun;
                     VLCBS += oNfe.Det.Ipost.IBSCBS.vCBS;
+                    blnIBSCBS = true;
                 }
                     XML.Append("</imposto>");
                     XML.Append("<infAdProd>FCP 0 BC 0.0 = 0.00</infAdProd>");
@@ -1272,7 +1274,7 @@ namespace NFE.Classes.NFE
                 XML.Append("</ICMSTot>");
 
                 //Totais dos tributos IBS/CBS e Imposto Seletivo
-                if (VLBCIBSCBS > 0)
+                if (blnIBSCBS)
                 {
                     oNfe.IcmsTot.vIBS = VLIBSUF + VLIBSMun;
                     oNfe.IcmsTot.vNFTot = oNfe.IcmsTot.vNF + oNfe.IcmsTot.vIBS + VLCBS;
