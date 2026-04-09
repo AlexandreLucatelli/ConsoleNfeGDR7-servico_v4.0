@@ -679,6 +679,7 @@ namespace NFE.Classes.NFE
 
                 oNfe.Det.Produto.NCM = Dr["IDNCM"] is DBNull ? string.Empty : Dr["IDNCM"].ToString().PadLeft(8, '0');
                 oNfe.Det.Produto.CEST = Dr["CEST"] is DBNull ? "0" : Dr["CEST"].ToString();
+                oNfe.Det.Produto.cBenef = Dr["cBenef"] is DBNull ? string.Empty : Dr["cBenef"].ToString();
                 oNfe.Det.Produto.CFOP = Dr["CFop"] is DBNull ? string.Empty : Dr["CFop"].ToString().PadLeft(4, '0');
                 oNfe.Det.Produto.uCom = Dr["Unidade"] is DBNull ? string.Empty : Dr["Unidade"].ToString();
                 oNfe.Det.Produto.qCom = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
@@ -838,6 +839,12 @@ namespace NFE.Classes.NFE
                 //// Alterado por: Bruno Arrais Cavalcante data: 13/06/2018
                 ////O campo CEST e os opcionais indEscala e CNPJFab foram movidos para um grupo próprio na NFe 4.0
                 XML.Append("<CEST>" + oNfe.Det.Produto.CEST + "</CEST>");
+
+                if(!string.IsNullOrEmpty(oNfe.Det.Produto.cBenef))
+                {
+                    XML.Append("<cBenef>" + oNfe.Det.Produto.cBenef + "</cBenef>");
+                }
+
                 //XML.Append("< indEscala > S </ indEscala >");
                 //XML.Append("< CNPJFab > CNPJFab1 </ CNPJFab >");
 
