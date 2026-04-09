@@ -43,6 +43,13 @@ namespace NFE.Classes.NFE.Objetos.Recepcao.Det.Produto
             set { _CEST = value; }
         }
 
+        string _cBenef;
+        public string cBenef
+        {
+            get { return _cBenef; }
+            set { _cBenef = value; }
+        }
+
         int _EXTIPI;
         public int EXTIPI
         {

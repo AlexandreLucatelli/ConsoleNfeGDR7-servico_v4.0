@@ -670,21 +670,21 @@ namespace NFE.Classes.NFE
 
                     oNfe.Det.Produto.xPed = Xped.Length > 15 ? Xped.TrimEnd().TrimStart().Substring(0, 15).TrimEnd().TrimStart() : Xped.TrimEnd().TrimStart();
 
-                    oNfe.Det.Produto.NCM = Dr["IDNCM"] is DBNull ? string.Empty : Dr["IDNCM"].ToString().PadLeft(8, '0');
-                    oNfe.Det.Produto.CEST = Dr["CEST"] is DBNull ? "0" : Dr["CEST"].ToString();
-                    oNfe.Det.Produto.CFOP = Dr["CFop"] is DBNull ? string.Empty : Dr["CFop"].ToString().PadLeft(4, '0');
-                    oNfe.Det.Produto.uCom = Dr["Unidade"] is DBNull ? string.Empty : Dr["Unidade"].ToString();
-                    oNfe.Det.Produto.qCom = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
-                    oNfe.Det.Produto.vUnCom = Dr["Vlunitario"] is DBNull ? 0 : decimal.Parse(Dr["Vlunitario"].ToString());
-                    oNfe.Det.Produto.vUnTrib = Dr["Vlunitario"] is DBNull ? 0 : decimal.Parse(Dr["Vlunitario"].ToString());
-                    oNfe.Det.Produto.vProd = Dr["ValorTotal"] is DBNull ? 0 : decimal.Parse(Dr["ValorTotal"].ToString());
-                    oNfe.Det.Produto.vFrete = Dr["ValorFrete"] is DBNull ? 0 : decimal.Parse(Dr["ValorFrete"].ToString());
-                    oNfe.Det.Produto.vSeg = Dr["ValorSeguro"] is DBNull ? 0 : decimal.Parse(Dr["ValorSeguro"].ToString());
-                    oNfe.Det.Produto.uTrib = Dr["unidade"] is DBNull ? "UN" : Dr["unidade"].ToString();
-                    oNfe.Det.Produto.qTrib = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
-                    oNfe.Det.Produto.vDesc = Dr["Desconto"] is DBNull ? 0 : decimal.Parse(Dr["Desconto"].ToString());
-                    oNfe.Det.Produto.SitTributB = Dr["SitTributB"] is DBNull ? "00" : Dr["SitTributB"].ToString();
-                    oNfe.Det.Produto.vOutras = Dr["OutrasDespesas"] is DBNull ? 0 : decimal.Parse(Dr["OutrasDespesas"].ToString());
+                oNfe.Det.Produto.NCM = Dr["IDNCM"] is DBNull ? string.Empty : Dr["IDNCM"].ToString().PadLeft(8, '0');
+                oNfe.Det.Produto.CEST = Dr["CEST"] is DBNull ? "0" : Dr["CEST"].ToString();
+                oNfe.Det.Produto.CFOP = Dr["CFop"] is DBNull ? string.Empty : Dr["CFop"].ToString().PadLeft(4, '0');
+                oNfe.Det.Produto.uCom = Dr["Unidade"] is DBNull ? string.Empty : Dr["Unidade"].ToString();
+                oNfe.Det.Produto.qCom = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
+                oNfe.Det.Produto.vUnCom = Dr["Vlunitario"] is DBNull ? 0 : decimal.Parse(Dr["Vlunitario"].ToString());
+                oNfe.Det.Produto.vUnTrib = Dr["Vlunitario"] is DBNull ? 0 : decimal.Parse(Dr["Vlunitario"].ToString());
+                oNfe.Det.Produto.vProd = Dr["ValorTotal"] is DBNull ? 0 : decimal.Parse(Dr["ValorTotal"].ToString());
+                oNfe.Det.Produto.vFrete = Dr["ValorFrete"] is DBNull ? 0 : decimal.Parse(Dr["ValorFrete"].ToString());
+                oNfe.Det.Produto.vSeg = Dr["ValorSeguro"] is DBNull ? 0 : decimal.Parse(Dr["ValorSeguro"].ToString());
+                oNfe.Det.Produto.uTrib = Dr["unidade"] is DBNull ? "UN" : Dr["unidade"].ToString();
+                oNfe.Det.Produto.qTrib = Dr["Qtde"] is DBNull ? 0 : decimal.Parse(Dr["Qtde"].ToString());
+                oNfe.Det.Produto.vDesc = Dr["Desconto"] is DBNull ? 0 : decimal.Parse(Dr["Desconto"].ToString());
+                oNfe.Det.Produto.SitTributB = Dr["SitTributB"] is DBNull ? "00" : Dr["SitTributB"].ToString();
+                oNfe.Det.Produto.vOutras = Dr["OutrasDespesas"] is DBNull ? 0 : decimal.Parse(Dr["OutrasDespesas"].ToString());
 
                 // II - TAG de grupo do Imposto de Importação
                 //oNfe.Det.Ipost.II.vBC = Dr["BaseII"] is DBNull ? 0 : decimal.Parse(Dr["BaseII"].ToString());
@@ -813,11 +813,11 @@ namespace NFE.Classes.NFE
                         XML.Append("<NCM>" + oNfe.Det.Produto.NCM + "</NCM>");
                     }
 
-                    //// Alterado por: Bruno Arrais Cavalcante data: 13/06/2018
-                    ////O campo CEST e os opcionais indEscala e CNPJFab foram movidos para um grupo próprio na NFe 4.0
-                    XML.Append("<CEST>" + oNfe.Det.Produto.CEST + "</CEST>");
-                    //XML.Append("< indEscala > S </ indEscala >");
-                    //XML.Append("< CNPJFab > CNPJFab1 </ CNPJFab >");
+                //// Alterado por: Bruno Arrais Cavalcante data: 13/06/2018
+                ////O campo CEST e os opcionais indEscala e CNPJFab foram movidos para um grupo próprio na NFe 4.0
+                XML.Append("<CEST>" + oNfe.Det.Produto.CEST + "</CEST>");
+                //XML.Append("< indEscala > S </ indEscala >");
+                //XML.Append("< CNPJFab > CNPJFab1 </ CNPJFab >");
 
                     XML.Append("<CFOP>" + oNfe.Det.Produto.CFOP.Replace(",", "") + "</CFOP>");
                     XML.Append("<uCom>" + oNfe.Util.FUNC_CARACTER_ESPECIAL(oNfe.Det.Produto.uCom.Replace(",", "")) + "</uCom>");
