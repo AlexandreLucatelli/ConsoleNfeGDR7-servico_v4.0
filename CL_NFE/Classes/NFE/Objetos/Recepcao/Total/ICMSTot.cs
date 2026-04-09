@@ -123,5 +123,48 @@ namespace NFE.Classes.NFE.Objetos.Recepcao.Total
             get { return _Retrib; }
             set { _Retrib = value; }
         }
+
+        decimal _vIBSUF;
+        public decimal vIBSUF
+        {
+            get { return _vIBSUF; }
+            set { _vIBSUF = value; }
+        }
+
+        decimal _vBCIBSCBS;
+        public decimal vBCIBSCBS
+        {
+            get { return _vBCIBSCBS; }
+            set { _vBCIBSCBS = value; }
+        }
+
+        decimal _vIBSMun;
+        public decimal vIBSMun
+        {
+            get { return _vIBSMun; }
+            set { _vIBSMun = value; }
+        }
+
+        decimal _vCBS;
+        public decimal vCBS
+        {
+            get { return _vCBS; }
+            set { _vCBS = value; }
+        }
+
+        decimal _vNFTot;
+        public decimal vNFTot
+        {
+            get { return _vNFTot; }
+            set { _vNFTot = value; }
+        }
+
+        decimal _vIBS;
+        public decimal vIBS
+        {
+            get { return _vIBS; }
+            set { _vIBS = value; }
+        }
+        
     }
 }

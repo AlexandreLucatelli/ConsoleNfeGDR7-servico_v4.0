@@ -58,7 +58,7 @@ namespace ConsoleNfeGDR7
                 // Recepcao Contingencia
                 //oxmlNova.MontaXMLContingencia();
 
-                //oxmlNova.XmlValidacao(486);
+                //oxmlNova.XmlValidacao(101678);
 
                 //}
             }

@@ -102,6 +102,7 @@
     <Compile Include="Classes\NFE\Objetos\Recepcao\Dest\enderDest.cs" />
     <Compile Include="Classes\NFE\Objetos\Recepcao\Det\Det.cs" />
     <Compile Include="Classes\NFE\Objetos\Recepcao\Det\Impostos\COFINS.cs" />
+    <Compile Include="Classes\NFE\Objetos\Recepcao\Det\Impostos\IBSCBS.cs" />
     <Compile Include="Classes\NFE\Objetos\Recepcao\Det\Impostos\ICMSST.cs" />
     <Compile Include="Classes\NFE\Objetos\Recepcao\Det\Impostos\ICMs\ICMS.cs" />
     <Compile Include="Classes\NFE\Objetos\Recepcao\Det\Impostos\ICMs\ICMS00.cs" />
