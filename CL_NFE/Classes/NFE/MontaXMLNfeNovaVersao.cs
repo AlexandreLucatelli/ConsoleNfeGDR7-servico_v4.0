@@ -292,7 +292,7 @@ namespace NFE.Classes.NFE
 
                     RetValidacao = oUtil.ValidaSchemaXML(strFullName, ConfigurationManager.AppSettings["PathSchemaNfe"].ToString());
 
-                    File.Delete(strFullName);
+                    //File.Delete(strFullName);
                 }
 
                 DrValidacao.Close();
@@ -337,6 +337,7 @@ namespace NFE.Classes.NFE
             StringBuilder XML = new StringBuilder();
             string[] parametros;
             SqlConnection cnnGeraXML = new SqlConnection(Conexao);
+
 
             try
             {
@@ -425,31 +426,32 @@ namespace NFE.Classes.NFE
                     XML.Append("<refNFe>" + oNfe.RefNf.chNfeReferenciada + "</refNFe>"); // Nfe Referenciada
                     XML.Append("</NFref>");
                 }
-                else if (oNfe.RefNf.finNFe == "4") // Devolução de Mercadoria
-                {
-                    SqlDataReader drItens = SqlHelper.ExecuteReader(cnnGeraXML, "stpRetornaDadosItens", oNfe.cNF);
+            // AS Notas de Devolução passaram a ter a referencia por Item, então o trecho abaixo foi desabilitado - 29/07/2026
+             //   else if (oNfe.RefNf.finNFe == "4") // Devolução de Mercadoria
+             //   {
+             //       SqlDataReader drItens = SqlHelper.ExecuteReader(cnnGeraXML, "stpRetornaDadosItens", oNfe.cNF);
 
-                    if (!string.IsNullOrEmpty(oNfe.RefNf.NfeReferenciada))
-                    {
-                        XML.Append("<NFref>");
-                        XML.Append("<refNFe>" + oNfe.RefNf.NfeReferenciada + "</refNFe>"); // Nfe Referenciada
-                        XML.Append("</NFref>");
-                    }
-                    else
-                    {
-                        while (drItens.Read())
-                        {
-                            XML.Append("<NFref>");
-                            XML.Append("<refECF>");
-                            XML.Append("<mod>" + drItens["modCupom"] + "</mod>");
-                            XML.Append("<nECF>" + drItens["nECF"] + "</nECF>");
-                            XML.Append("<nCOO>" + drItens["nCOO"] + "</nCOO>");
-                            XML.Append("</refECF>");
-                            XML.Append("</NFref>");
-                        }
-                    }
-                    drItens.Close();
-             }
+             //       if (!string.IsNullOrEmpty(oNfe.RefNf.NfeReferenciada))
+             //       {
+             //           XML.Append("<NFref>");
+             //           XML.Append("<refNFe>" + oNfe.RefNf.NfeReferenciada + "</refNFe>"); // Nfe Referenciada
+             //           XML.Append("</NFref>");
+             //       }
+             //       else
+             //       {
+             //           while (drItens.Read())
+             //           {
+             //               XML.Append("<NFref>");
+             //               XML.Append("<refECF>");
+             //               XML.Append("<mod>" + drItens["modCupom"] + "</mod>");
+             //               XML.Append("<nECF>" + drItens["nECF"] + "</nECF>");
+             //               XML.Append("<nCOO>" + drItens["nCOO"] + "</nCOO>");
+             //               XML.Append("</refECF>");
+             //               XML.Append("</NFref>");
+             //           }
+             //       }
+             //       drItens.Close();
+             //}
 
                 XML.Append("</ide>");
                 #endregion
@@ -1200,11 +1202,31 @@ namespace NFE.Classes.NFE
                     VLCBS += oNfe.Det.Ipost.IBSCBS.vCBS;
                     blnIBSCBS = true;
                 }
-                    XML.Append("</imposto>");
-                    XML.Append("<infAdProd>FCP 0 BC 0.0 = 0.00</infAdProd>");
-                    XML.Append("</det>");
+                XML.Append("</imposto>");
+                XML.Append("<infAdProd>FCP 0 BC 0.0 = 0.00</infAdProd>");
 
-                    Contator++;
+                if (oNfe.RefNf.finNFe == "4") // Devolução de Mercadoria
+                {
+                    SqlConnection cnnDFeReferenciado = new SqlConnection(Conexao);
+                    SqlDataReader DrDFeReferenciado = SqlHelper.ExecuteReader(
+                        cnnDFeReferenciado,
+                        "stpRetornaDFeReferenciado",
+                        Dr["ID"].ToString()
+                    );
+
+                    while (DrDFeReferenciado.Read())
+                    {
+                        XML.Append("<DFeReferenciado>");
+                        XML.Append("<chaveAcesso>" + DrDFeReferenciado["chnfe"].ToString() + "</chaveAcesso>");
+                        XML.Append("<nItem>" + DrDFeReferenciado["nItem"].ToString() + "</nItem>");
+                        XML.Append("</DFeReferenciado>");
+                    }
+                    DrDFeReferenciado.Close();
+
+                }
+                    
+                XML.Append("</det>");
+                Contator++;
                 }
                 Dr.Close();
 

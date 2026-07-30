@@ -41,11 +41,19 @@ namespace ConsoleNfeGDR7
 
                 NFE.Classes.NFE.MontaXMLNfeNovaVersao objNFe = new NFE.Classes.NFE.MontaXMLNfeNovaVersao();
 
+                /////////////////////////////////////////////////////////
+                //DESATIVADOS
+
                 // RetRecepcao
                 //objRetRecepcaoNova.FncRetRecepcao();
 
                 // Cancelamento
                 //objCancelamentoNova.FncCancelamento();
+
+                // Recepcao Contingencia
+                //oxmlNova.MontaXMLContingencia();
+
+                /////////////////////////////////////////////////////////
 
                 objEventoCancelamento.IniciaProcessoCancelamento();
 
@@ -54,9 +62,6 @@ namespace ConsoleNfeGDR7
 
                 // Carta de Correção
                 objCCe.FncCCe();
-
-                // Recepcao Contingencia
-                //oxmlNova.MontaXMLContingencia();
 
                 //oxmlNova.XmlValidacao(101678);
 
