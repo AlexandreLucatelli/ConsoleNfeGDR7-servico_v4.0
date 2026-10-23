@@ -2019,11 +2019,21 @@ namespace NFE.Classes.NFE
                             }
                             else //Se retorno qualquer outro cStat, a NFe foi rejeitada
                             {
-                                // Atualiza o status da NFe para Rejeitada
-                                StatusNfe = "4"; // Rejeitada
+                                // Duplicidade: a NF-e pode já estar autorizada na SEFAZ (ex.: falha ao gravar o status na tentativa anterior)
+                                if ((cStat == "204" || cStat == "539") && TentaRecuperarAutorizacao(oNfe, MotivoNfe, CertAssina))
+                                {
+                                    // Status já atualizado para Aprovada dentro do método.
+                                    // StatusNfe, MotivoNfe, nProt e dtRetorno (campos da classe) foram preenchidos por ele.
+                                    cStat = "100";
+                                }
+                                else
+                                {
+                                    // Atualiza o status da NFe para Rejeitada
+                                    StatusNfe = "4"; // Rejeitada
 
-                                string[] ParamAtualizaNfe = { "2", oNfe.cNF, StatusNfe, cStat, MotivoNfe, nProt, dtRetorno == "" ? null : dtRetorno, IdNota.ToString(), null, null };
-                                SqlHelper.ExecuteNonQuery(cnnMontaXML2, "StpNfe", ParamAtualizaNfe);
+                                    string[] ParamAtualizaNfe = { "2", oNfe.cNF, StatusNfe, cStat, MotivoNfe, nProt, dtRetorno == "" ? null : dtRetorno, IdNota.ToString(), null, null };
+                                    SqlHelper.ExecuteNonQuery(cnnMontaXML2, "StpNfe", ParamAtualizaNfe);
+                                }
                             }
                             // Gera o histórico da NFe
                             Observacao = "StatusNFe: " + StatusNfe + "| cStat: " + cStat + "| MotivoNfe: " + MotivoNfe + "| nProt: " + nProt + "| dtRetorno: " + dtRetorno;
@@ -2254,6 +2264,119 @@ namespace NFE.Classes.NFE
         public void TesteString(string str)
         {
             str = oUtil.FUNC_CARACTER_ESPECIAL(str);
+        }
+
+        /// <summary>
+        /// Chamado quando o envio retorna duplicidade (204/539). Consulta a NF-e pela chave:
+        /// se estiver autorizada (100/150), atualiza para Aprovada. Retorna true se recuperou.
+        /// </summary>
+        private bool TentaRecuperarAutorizacao(NotaFiscalEletronica oNfe, string motivoRej, X509Certificate2 cert)
+        {
+            try
+            {
+                // 204: mesma chave desta emissão. 539: a chave autorizada vem na mensagem de rejeição.
+                string chave = oNfe.infNfe.Substring(3);
+                System.Text.RegularExpressions.Match m =
+                    System.Text.RegularExpressions.Regex.Match(motivoRej ?? "", @"chNFe:\s*(\d{44})");
+                if (m.Success)
+                    chave = m.Groups[1].Value;
+
+                XmlDocument xmlCons = ConsultaProtocoloPorChave(chave, cert);
+
+                XmlNodeList nCStat = xmlCons.GetElementsByTagName("cStat");
+                if (nCStat.Count == 0) return false;
+
+                string cStatCons = nCStat.Item(0).InnerText;
+                if (cStatCons != "100" && cStatCons != "150") return false; // 100 = autorizada | 150 = autorizada fora do prazo
+
+                XmlNodeList protNodes = xmlCons.GetElementsByTagName("protNFe");
+                if (protNodes.Count == 0) return false;
+
+                XmlElement prot = (XmlElement)protNodes.Item(0);
+                XmlNodeList nProtNode = prot.GetElementsByTagName("nProt");
+                if (nProtNode.Count == 0) return false;
+
+                XmlNodeList dhNode = prot.GetElementsByTagName("dhRecbto");
+                XmlNodeList digNode = prot.GetElementsByTagName("digVal");
+
+                nProt = nProtNode.Item(0).InnerText;
+                dtRetorno = dhNode.Count > 0 ? dhNode.Item(0).InnerText : "";
+                MotivoNfe = "Autorizado o uso da NF-e (recuperada por consulta de duplicidade)";
+                StatusNfe = "3"; // Aprovada
+
+                // Atualiza o status primeiro (com 1 retry), antes de qualquer operação mais lenta
+                string[] ParamAprova = { "2", oNfe.cNF, StatusNfe, "100", MotivoNfe, nProt, dtRetorno == "" ? null : dtRetorno, chave, null, null };
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(Conexao, "StpNfe", ParamAprova);
+                }
+                catch (Exception)
+                {
+                    System.Threading.Thread.Sleep(500);
+                    SqlHelper.ExecuteNonQuery(Conexao, "StpNfe", ParamAprova);
+                }
+
+                // Só gera o XML de distribuição se o XML local for exatamente o que foi autorizado
+                // (compara o DigestValue da assinatura com o digVal do protocolo).
+                try
+                {
+                    XmlDocument xmlLocal = new XmlDocument();
+                    xmlLocal.Load(obj.PastaXMLRecepcao + oNfe.cNF + ".xml");
+                    XmlNodeList dv = xmlLocal.GetElementsByTagName("DigestValue");
+
+                    if (dv.Count > 0 && digNode.Count > 0 && dv.Item(0).InnerText == digNode.Item(0).InnerText)
+                    {
+                        obj.Util.FncGravaXML(xmlCons.OuterXml, obj.PastaXMLRecepcaoRetorno + oNfe.cNF + ".xml");
+                        FncGeraXMLCliente(Convert.ToInt32(oNfe.cNF));
+                    }
+                    else
+                    {
+                        MotivoNfe += " | XML de distribuição NÃO gerado: XML local difere do autorizado";
+                    }
+                }
+                catch (Exception exXml)
+                {
+                    MotivoNfe += " | Falha ao gerar XML de distribuição: " + exXml.Message;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                StreamWriter log = new StreamWriter(pastaErro + "Duplicidade_" + oNfe.cNF + "_" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".txt", false, Encoding.ASCII);
+                log.WriteLine("***************** DUPLICIDADE - CONSULTA POR CHAVE *****************");
+                log.WriteLine("IDNota: " + oNfe.cNF);
+                log.WriteLine(ex.Message);
+                log.WriteLine(ex.ToString());
+                log.Flush();
+                log.Close();
+                return false; // mantém o comportamento atual (Rejeitada)
+            }
+        }
+
+        /// <summary>
+        /// Consulta situação da NF-e (NFeConsultaProtocolo 4.00) pela chave de acesso.
+        /// Ligar ao WebService de consulta que já existe no projeto (homologação/produção).
+        /// </summary>
+        private XmlDocument ConsultaProtocoloPorChave(string chave, X509Certificate2 cert)
+        {
+            XmlDocument docEnvio = new XmlDocument();
+            docEnvio.LoadXml("<consSitNFe versao='4.00' xmlns='http://www.portalfiscal.inf.br/nfe'>"
+                           + "<tpAmb>" + ConfigurationManager.AppSettings["Ambiente"].ToString() + "</tpAmb>"
+                           + "<xServ>CONSULTAR</xServ>"
+                           + "<chNFe>" + chave + "</chNFe></consSitNFe>");
+
+            // Exemplo (ajuste os nomes conforme suas Web References):
+            // if (ConfigurationManager.AppSettings["Ambiente"].ToString() == "2")
+            // {
+            //     CL_NFE.HomoNFeConsultaProtocolo4.NFeConsultaProtocolo4 ws = new CL_NFE.HomoNFeConsultaProtocolo4.NFeConsultaProtocolo4();
+            //     ws.ClientCertificates.Add(cert);
+            //     XmlNode ret = ws.nfeConsultaNF(docEnvio.DocumentElement);
+            //     XmlDocument d = new XmlDocument(); d.LoadXml(ret.OuterXml); return d;
+            // }
+            // else { ...ProdNFeConsultaProtocolo4... }
+
+            throw new NotImplementedException("Ligar ao WebService NFeConsultaProtocolo4 do projeto.");
         }
     }
 }

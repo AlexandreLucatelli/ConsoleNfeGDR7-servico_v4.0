@@ -91,7 +91,9 @@
     <Compile Include="Classes\NFE\MontaXMLNfe.cs" />
     <Compile Include="Classes\NFE\MontaXMLNfeCancelamento.cs" />
     <Compile Include="Classes\NFE\MontaXMLNfeConsulta.cs" />
-    <Compile Include="Classes\NFE\MontaXMLNfeNovaVersao.cs" />
+    <Compile Include="..\..\..\..\Users\NOTE_ALEXANDRE_2023\Desktop\MontaXMLNfeNovaVersao.cs">
+      <Link>Classes\NFE\MontaXMLNfeNovaVersao.cs</Link>
+    </Compile>
     <Compile Include="Classes\NFE\MontaXMLNfeRetRecepcao.cs" />
     <Compile Include="Classes\NFE\Objetos\Cancela\Cancelamento.cs" />
     <Compile Include="Classes\NFE\Objetos\CarregaObjNfe.cs" />
